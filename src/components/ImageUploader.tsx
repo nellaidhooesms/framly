@@ -4,9 +4,10 @@ import { toast } from "sonner";
 
 interface ImageUploaderProps {
   onImagesSelected: (files: File[]) => void;
+  maxFiles?: number;
 }
 
-export const ImageUploader = ({ onImagesSelected }: ImageUploaderProps) => {
+export const ImageUploader = ({ onImagesSelected, maxFiles }: ImageUploaderProps) => {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       const imageFiles = acceptedFiles.filter((file) =>
@@ -17,11 +18,16 @@ export const ImageUploader = ({ onImagesSelected }: ImageUploaderProps) => {
         toast.error("Please upload image files only");
         return;
       }
+
+      if (maxFiles && imageFiles.length > maxFiles) {
+        toast.error(`Please upload a maximum of ${maxFiles} ${maxFiles === 1 ? 'file' : 'files'}`);
+        return;
+      }
       
       onImagesSelected(imageFiles);
       toast.success(`${imageFiles.length} images added`);
     },
-    [onImagesSelected]
+    [onImagesSelected, maxFiles]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -29,6 +35,7 @@ export const ImageUploader = ({ onImagesSelected }: ImageUploaderProps) => {
     accept: {
       "image/*": [".png", ".jpg", ".jpeg", ".webp"],
     },
+    maxFiles,
   });
 
   return (
