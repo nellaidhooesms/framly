@@ -13,14 +13,21 @@ export const createSquareImage = async (
     const scale = size / originalImage.height;
     const scaledWidth = originalImage.width * scale;
     
-    // Draw blurred background (stretched version)
+    // Calculate blur background scale to ensure it fills the square
+    const blurScale = Math.max(size / originalImage.width, size / originalImage.height);
+    const blurWidth = originalImage.width * blurScale;
+    const blurHeight = originalImage.height * blurScale;
+    const blurX = (size - blurWidth) / 2;
+    const blurY = (size - blurHeight) / 2;
+    
+    // Draw blurred background (scaled to fill)
     ctx.filter = "blur(20px)";
     ctx.drawImage(
       originalImage,
-      -(size - scaledWidth) / 2,
-      0,
-      size,
-      size
+      blurX,
+      blurY,
+      blurWidth,
+      blurHeight
     );
     
     // Reset filter and draw main image centered
