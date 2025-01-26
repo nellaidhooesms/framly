@@ -54,26 +54,76 @@ export const createSquareImage = async (
 
 export const addWatermark = async (
   image: string,
-  watermarkText: string
+  watermarkConfig: {
+    logo?: string;
+    overlay?: string;
+    bottomImages: string[];
+  }
 ): Promise<string> => {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
   const img = new Image();
   
   return new Promise((resolve) => {
-    img.onload = () => {
+    img.onload = async () => {
       canvas.width = img.width;
       canvas.height = img.height;
       
       // Draw original image
       ctx.drawImage(img, 0, 0);
       
-      // Add watermark
-      ctx.font = "bold 32px Arial";
-      ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-      ctx.textAlign = "end";
-      ctx.textBaseline = "bottom";
-      ctx.fillText(watermarkText, canvas.width - 20, canvas.height - 20);
+      // Add logo if provided
+      if (watermarkConfig.logo) {
+        const logo = new Image();
+        await new Promise((resolve) => {
+          logo.onload = resolve;
+          logo.src = watermarkConfig.logo;
+        });
+        
+        const logoSize = canvas.width * 0.15; // 15% of image width
+        ctx.drawImage(logo, 20, 20, logoSize, logoSize);
+      }
+      
+      // Add overlay if provided
+      if (watermarkConfig.overlay) {
+        const overlay = new Image();
+        await new Promise((resolve) => {
+          overlay.onload = resolve;
+          overlay.src = watermarkConfig.overlay;
+        });
+        
+        const overlayWidth = canvas.width * 0.2;
+        const overlayHeight = canvas.height * 0.3;
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(
+          overlay,
+          20,
+          canvas.height / 2 - overlayHeight / 2,
+          overlayWidth,
+          overlayHeight
+        );
+        ctx.globalAlpha = 1;
+      }
+      
+      // Add bottom images if provided
+      if (watermarkConfig.bottomImages.length > 0) {
+        const bottomHeight = canvas.height * 0.1; // 10% of image height
+        const spacing = 20;
+        const maxImages = 3;
+        
+        for (let i = 0; i < Math.min(maxImages, watermarkConfig.bottomImages.length); i++) {
+          const bottomImg = new Image();
+          await new Promise((resolve) => {
+            bottomImg.onload = resolve;
+            bottomImg.src = watermarkConfig.bottomImages[i];
+          });
+          
+          const x = canvas.width - ((i + 1) * (bottomHeight + spacing));
+          const y = canvas.height - bottomHeight - 20;
+          
+          ctx.drawImage(bottomImg, x, y, bottomHeight, bottomHeight);
+        }
+      }
       
       resolve(canvas.toDataURL("image/jpeg", 0.95));
     };
