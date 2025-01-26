@@ -9,24 +9,29 @@ export const createSquareImage = async (
 
   // If image is portrait, add blurred background
   if (originalImage.height > originalImage.width) {
-    // Create blur effect
-    ctx.filter = "blur(10px)";
-    const scale = size / originalImage.width;
-    const scaledHeight = originalImage.height * scale;
+    // Calculate scaling to fit height while maintaining aspect ratio
+    const scale = size / originalImage.height;
+    const scaledWidth = originalImage.width * scale;
+    
+    // Draw blurred background (stretched version)
+    ctx.filter = "blur(20px)";
     ctx.drawImage(
       originalImage,
+      -(size - scaledWidth) / 2,
       0,
-      -(scaledHeight - size) / 2,
       size,
-      scaledHeight
+      size
     );
     
-    // Clear filter and draw main image
+    // Reset filter and draw main image centered
     ctx.filter = "none";
-    const targetWidth = size;
-    const targetHeight = (originalImage.height * size) / originalImage.width;
-    const y = (size - targetHeight) / 2;
-    ctx.drawImage(originalImage, 0, y, targetWidth, targetHeight);
+    ctx.drawImage(
+      originalImage,
+      (size - scaledWidth) / 2,
+      0,
+      scaledWidth,
+      size
+    );
   } else {
     // For landscape or square images, center crop
     const scale = size / Math.min(originalImage.width, originalImage.height);
