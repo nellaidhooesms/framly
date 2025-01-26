@@ -3,6 +3,8 @@ import { ImageUploader } from "./ImageUploader";
 import { ImagePreview } from "./ImagePreview";
 import { createSquareImage, addWatermark } from "../utils/imageProcessing";
 import { toast } from "sonner";
+import { Button } from "./ui/button";
+import { FolderOpen, Play } from "lucide-react";
 
 export const ImageProcessor = () => {
   const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
@@ -15,6 +17,28 @@ export const ImageProcessor = () => {
       preview: URL.createObjectURL(file),
     }));
     setImages((prev) => [...prev, ...newImages]);
+  };
+
+  const handleFolderSelect = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.webkitdirectory = true;
+    input.multiple = true;
+    
+    input.onchange = (e) => {
+      const files = Array.from((e.target as HTMLInputElement).files || [])
+        .filter(file => file.type.startsWith('image/'));
+      
+      if (files.length === 0) {
+        toast.error("No image files found in the selected folder");
+        return;
+      }
+      
+      handleImagesSelected(files);
+      toast.success(`${files.length} images loaded from folder`);
+    };
+    
+    input.click();
   };
 
   const processImage = async (index: number) => {
@@ -50,6 +74,23 @@ export const ImageProcessor = () => {
     }
   };
 
+  const processAllImages = async () => {
+    if (images.length === 0) {
+      toast.error("No images to process");
+      return;
+    }
+
+    toast.info("Processing all images...");
+    
+    for (let i = 0; i < images.length; i++) {
+      if (!processedImages[i]) {
+        await processImage(i);
+      }
+    }
+    
+    toast.success("All images processed successfully");
+  };
+
   const downloadAll = () => {
     processedImages.forEach((image, index) => {
       const link = document.createElement("a");
@@ -62,10 +103,31 @@ export const ImageProcessor = () => {
 
   return (
     <div className="space-y-8">
-      <ImageUploader onImagesSelected={handleImagesSelected} />
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+        <Button
+          onClick={handleFolderSelect}
+          variant="outline"
+          className="w-full sm:w-auto"
+        >
+          <FolderOpen className="mr-2" />
+          Open Folder
+        </Button>
+        <ImageUploader onImagesSelected={handleImagesSelected} />
+      </div>
       
       {images.length > 0 && (
         <>
+          <div className="flex justify-center">
+            <Button
+              onClick={processAllImages}
+              className="w-full sm:w-auto"
+              disabled={processing.size > 0}
+            >
+              <Play className="mr-2" />
+              Process All Images
+            </Button>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {images.map((image, index) => (
               <ImagePreview
@@ -79,12 +141,13 @@ export const ImageProcessor = () => {
           
           {processedImages.length > 0 && (
             <div className="flex justify-center">
-              <button
+              <Button
                 onClick={downloadAll}
-                className="px-6 py-3 bg-accent text-white rounded-md hover:bg-accent/90 transition-colors"
+                variant="secondary"
+                className="w-full sm:w-auto"
               >
                 Download All Processed Images
-              </button>
+              </Button>
             </div>
           )}
         </>
