@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Skeleton } from "./ui/skeleton";
 
 interface ImagePreviewProps {
   src: string;
@@ -15,6 +16,7 @@ export const ImagePreview = ({
 
   return (
     <div className="relative rounded-lg overflow-hidden animate-fade-up">
+      {!isLoaded && <Skeleton className="w-full aspect-square" />}
       <img
         src={src}
         alt="Preview"
@@ -25,7 +27,10 @@ export const ImagePreview = ({
       />
       <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
         {isProcessing ? (
-          <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <span className="text-white text-sm">Processing...</span>
+          </div>
         ) : (
           <button
             onClick={onProcess}
