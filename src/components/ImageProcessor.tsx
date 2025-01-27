@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ImageUploader } from "./ImageUploader";
 import { ImagePreview } from "./ImagePreview";
 import { createSquareImage, addWatermark } from "../utils/imageProcessing";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { FolderOpen, Play } from "lucide-react";
-import { WatermarkLayout, WatermarkConfig } from "./WatermarkLayout";
+import { WatermarkConfig } from "./WatermarkLayout";
 
 export const ImageProcessor = () => {
   const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
@@ -14,6 +14,14 @@ export const ImageProcessor = () => {
   const [watermarkConfig, setWatermarkConfig] = useState<WatermarkConfig>({
     bottomImages: []
   });
+
+  useEffect(() => {
+    // Load watermark config from localStorage
+    const savedConfig = localStorage.getItem('watermarkConfig');
+    if (savedConfig) {
+      setWatermarkConfig(JSON.parse(savedConfig));
+    }
+  }, []);
 
   const handleImagesSelected = (files: File[]) => {
     const newImages = files.map((file) => ({
@@ -107,8 +115,6 @@ export const ImageProcessor = () => {
 
   return (
     <div className="space-y-8">
-      <WatermarkLayout onSave={setWatermarkConfig} />
-      
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
         <Button
           onClick={handleFolderSelect}

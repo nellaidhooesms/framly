@@ -62,72 +62,51 @@ export const addWatermark = async (
 ): Promise<string> => {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
-  const img = new Image();
+  const img = await loadImage(image);
   
+  canvas.width = img.width;
+  canvas.height = img.height;
+  
+  // Draw original image
+  ctx.drawImage(img, 0, 0);
+  
+  // Add logo if provided (top left, 150x150)
+  if (watermarkConfig.logo) {
+    const logo = await loadImage(watermarkConfig.logo);
+    const logoSize = 150;
+    ctx.drawImage(logo, 20, 20, logoSize, logoSize);
+  }
+  
+  // Add overlay if provided (top right, 300x300)
+  if (watermarkConfig.overlay) {
+    const overlay = await loadImage(watermarkConfig.overlay);
+    ctx.globalAlpha = 0.5;
+    ctx.drawImage(overlay, canvas.width - 320, 20, 300, 300);
+    ctx.globalAlpha = 1;
+  }
+  
+  // Add bottom images if provided (1080x150)
+  if (watermarkConfig.bottomImages.length > 0) {
+    const bottomHeight = 150;
+    const bottomWidth = 1080;
+    const maxImages = Math.min(3, watermarkConfig.bottomImages.length);
+    const spacing = 20;
+    
+    for (let i = 0; i < maxImages; i++) {
+      const bottomImg = await loadImage(watermarkConfig.bottomImages[i]);
+      const x = canvas.width - ((i + 1) * (bottomWidth + spacing));
+      const y = canvas.height - bottomHeight - 20;
+      ctx.drawImage(bottomImg, x, y, bottomWidth, bottomHeight);
+    }
+  }
+  
+  return canvas.toDataURL("image/jpeg", 0.95);
+};
+
+const loadImage = (src: string): Promise<HTMLImageElement> => {
   return new Promise((resolve) => {
-    img.onload = async () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      
-      // Draw original image
-      ctx.drawImage(img, 0, 0);
-      
-      // Add logo if provided
-      if (watermarkConfig.logo) {
-        const logo = new Image();
-        await new Promise((resolve) => {
-          logo.onload = resolve;
-          logo.src = watermarkConfig.logo;
-        });
-        
-        const logoSize = canvas.width * 0.15; // 15% of image width
-        ctx.drawImage(logo, 20, 20, logoSize, logoSize);
-      }
-      
-      // Add overlay if provided (top right, 300x300)
-      if (watermarkConfig.overlay) {
-        const overlay = new Image();
-        await new Promise((resolve) => {
-          overlay.onload = resolve;
-          overlay.src = watermarkConfig.overlay;
-        });
-        
-        const overlayWidth = 300;
-        const overlayHeight = 300;
-        ctx.globalAlpha = 0.5;
-        ctx.drawImage(
-          overlay,
-          canvas.width - overlayWidth - 20,
-          20,
-          overlayWidth,
-          overlayHeight
-        );
-        ctx.globalAlpha = 1;
-      }
-      
-      // Add bottom images if provided (1080x150)
-      if (watermarkConfig.bottomImages.length > 0) {
-        const bottomHeight = 150;
-        const bottomWidth = 1080;
-        const maxImages = 3;
-        const spacing = 20;
-        
-        for (let i = 0; i < Math.min(maxImages, watermarkConfig.bottomImages.length); i++) {
-          const bottomImg = new Image();
-          await new Promise((resolve) => {
-            bottomImg.onload = resolve;
-            bottomImg.src = watermarkConfig.bottomImages[i];
-          });
-          
-          const x = canvas.width - ((i + 1) * (bottomWidth + spacing));
-          const y = canvas.height - bottomHeight - 20;
-          
-          ctx.drawImage(bottomImg, x, y, bottomWidth, bottomHeight);
-        }
-      }
-      
-      resolve(canvas.toDataURL("image/jpeg", 0.95));
-    };
-    img.src = image;
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.src = src;
   });
 };
