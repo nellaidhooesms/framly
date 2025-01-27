@@ -1,6 +1,17 @@
-import { WatermarkLayout } from "../components/WatermarkLayout";
+import { WatermarkLayout, WatermarkConfig as WatermarkConfigType } from "../components/WatermarkLayout";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const WatermarkConfig = () => {
+  const navigate = useNavigate();
+
+  const handleSave = (config: WatermarkConfigType) => {
+    // Save to localStorage
+    localStorage.setItem('watermarkConfig', JSON.stringify(config));
+    toast.success("Watermark configuration saved successfully");
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground p-8">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -8,7 +19,7 @@ const WatermarkConfig = () => {
         <p className="text-center text-muted-foreground">
           Configure your watermark layout including logo, overlay, and bottom images.
         </p>
-        <WatermarkLayout />
+        <WatermarkLayout onSave={handleSave} />
       </div>
     </div>
   );
