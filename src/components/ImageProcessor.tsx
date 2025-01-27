@@ -4,13 +4,17 @@ import { ImagePreview } from "./ImagePreview";
 import { createSquareImage, addWatermark } from "../utils/imageProcessing";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
-import { FolderOpen, Play } from "lucide-react";
+import { FolderOpen, Play, Upload } from "lucide-react";
 import { WatermarkConfig } from "./WatermarkLayout";
+import { useDropzone } from "react-dropzone";
+import { Progress } from "./ui/progress";
 
 export const ImageProcessor = () => {
   const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
   const [processing, setProcessing] = useState<Set<number>>(new Set());
   const [processedImages, setProcessedImages] = useState<string[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState(false);
   const [watermarkConfig, setWatermarkConfig] = useState<WatermarkConfig>({
     bottomImages: [],
     textConfig: {
@@ -19,8 +23,33 @@ export const ImageProcessor = () => {
     }
   });
 
+  const onDrop = (acceptedFiles: File[]) => {
+    handleImagesSelected(acceptedFiles);
+    setUploadProgress(0);
+    simulateUploadProgress();
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': ['.png', '.jpg', '.jpeg', '.gif']
+    }
+  });
+
+  const simulateUploadProgress = () => {
+    setUploadProgress(0);
+    const interval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 100);
+  };
+
   useEffect(() => {
-    // Load watermark config from localStorage
     try {
       const savedConfig = localStorage.getItem('watermarkConfig');
       if (savedConfig) {
@@ -38,6 +67,7 @@ export const ImageProcessor = () => {
       preview: URL.createObjectURL(file),
     }));
     setImages((prev) => [...prev, ...newImages]);
+    toast.success(`${files.length} images added successfully`);
   };
 
   const handleFolderSelect = () => {
@@ -124,6 +154,31 @@ export const ImageProcessor = () => {
 
   return (
     <div className="space-y-8">
+      <div 
+        {...getRootProps()} 
+        className={`
+          border-2 border-dashed rounded-lg p-8 transition-colors
+          ${isDragActive ? 'border-primary bg-primary/10' : 'border-gray-300'}
+          hover:border-primary hover:bg-primary/5
+        `}
+      >
+        <input {...getInputProps()} />
+        <div className="flex flex-col items-center gap-4">
+          <Upload className="w-12 h-12 text-gray-400" />
+          <p className="text-center text-gray-600">
+            Drag and drop images here, or click to select files
+          </p>
+          {uploadProgress > 0 && uploadProgress < 100 && (
+            <div className="w-full max-w-xs">
+              <Progress value={uploadProgress} className="h-2" />
+              <p className="text-sm text-gray-500 mt-2 text-center">
+                Uploading... {uploadProgress}%
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
         <Button
           onClick={handleFolderSelect}
