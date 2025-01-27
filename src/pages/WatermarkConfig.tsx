@@ -6,10 +6,59 @@ const WatermarkConfig = () => {
   const navigate = useNavigate();
 
   const handleSave = (config: WatermarkConfigType) => {
-    // Save to localStorage
-    localStorage.setItem('watermarkConfig', JSON.stringify(config));
-    toast.success("Watermark configuration saved successfully");
-    navigate('/');
+    try {
+      // Compress the images before saving to localStorage
+      const compressedConfig = {
+        ...config,
+        logo: config.logo ? compressImage(config.logo) : undefined,
+        overlay: config.overlay ? compressImage(config.overlay) : undefined,
+        bottomImages: config.bottomImages.map(img => compressImage(img))
+      };
+
+      // Save to localStorage
+      localStorage.setItem('watermarkConfig', JSON.stringify(compressedConfig));
+      toast.success("Watermark configuration saved successfully");
+      navigate('/');
+    } catch (error) {
+      console.error('Error saving watermark config:', error);
+      toast.error("Failed to save watermark configuration. Try using smaller images.");
+    }
+  };
+
+  // Helper function to compress base64 images
+  const compressImage = (base64: string): string => {
+    const canvas = document.createElement('canvas');
+    const img = new Image();
+    img.src = base64;
+    
+    // Set maximum dimensions
+    const maxWidth = 800;
+    const maxHeight = 800;
+    
+    let width = img.width;
+    let height = img.height;
+    
+    // Calculate new dimensions
+    if (width > height) {
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+    } else {
+      if (height > maxHeight) {
+        width = Math.round((width * maxHeight) / height);
+        height = maxHeight;
+      }
+    }
+    
+    canvas.width = width;
+    canvas.height = height;
+    
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(img, 0, 0, width, height);
+    
+    // Compress image to JPEG with lower quality
+    return canvas.toDataURL('image/jpeg', 0.5);
   };
 
   return (

@@ -12,14 +12,23 @@ export const ImageProcessor = () => {
   const [processing, setProcessing] = useState<Set<number>>(new Set());
   const [processedImages, setProcessedImages] = useState<string[]>([]);
   const [watermarkConfig, setWatermarkConfig] = useState<WatermarkConfig>({
-    bottomImages: []
+    bottomImages: [],
+    textConfig: {
+      text: "",
+      direction: "ltr"
+    }
   });
 
   useEffect(() => {
     // Load watermark config from localStorage
-    const savedConfig = localStorage.getItem('watermarkConfig');
-    if (savedConfig) {
-      setWatermarkConfig(JSON.parse(savedConfig));
+    try {
+      const savedConfig = localStorage.getItem('watermarkConfig');
+      if (savedConfig) {
+        setWatermarkConfig(JSON.parse(savedConfig));
+      }
+    } catch (error) {
+      console.error('Error loading watermark config:', error);
+      toast.error('Failed to load watermark configuration');
     }
   }, []);
 
