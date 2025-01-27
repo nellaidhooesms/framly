@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { ImageUploader } from "./ImageUploader";
+import { Input } from "./ui/input";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Label } from "./ui/label";
 import { toast } from "sonner";
 
 interface WatermarkLayoutProps {
@@ -11,12 +14,18 @@ export interface WatermarkConfig {
   logo?: string;
   overlay?: string;
   bottomImages: string[];
+  textConfig: {
+    text: string;
+    direction: "ltr" | "rtl";
+  };
 }
 
 export const WatermarkLayout = ({ onSave }: WatermarkLayoutProps) => {
   const [logo, setLogo] = useState<string>();
   const [overlay, setOverlay] = useState<string>();
   const [bottomImages, setBottomImages] = useState<string[]>([]);
+  const [text, setText] = useState("");
+  const [textDirection, setTextDirection] = useState<"ltr" | "rtl">("ltr");
 
   const handleLogoUpload = (files: File[]) => {
     if (files[0]) {
@@ -60,6 +69,10 @@ export const WatermarkLayout = ({ onSave }: WatermarkLayoutProps) => {
       logo,
       overlay,
       bottomImages,
+      textConfig: {
+        text,
+        direction: textDirection,
+      },
     });
     toast.success("Watermark layout saved");
   };
@@ -98,6 +111,33 @@ export const WatermarkLayout = ({ onSave }: WatermarkLayoutProps) => {
               className="w-24 h-24 object-cover rounded"
             />
           ))}
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Image Description</h3>
+        <Input
+          placeholder="Enter image description"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium">Text Direction</h4>
+          <RadioGroup
+            value={textDirection}
+            onValueChange={(value: "ltr" | "rtl") => setTextDirection(value)}
+            className="flex gap-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="ltr" id="ltr" />
+              <Label htmlFor="ltr">Left to Right</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rtl" id="rtl" />
+              <Label htmlFor="rtl">Right to Left</Label>
+            </div>
+          </RadioGroup>
         </div>
       </div>
 

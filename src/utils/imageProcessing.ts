@@ -58,6 +58,10 @@ export const addWatermark = async (
     logo?: string;
     overlay?: string;
     bottomImages: string[];
+    textConfig: {
+      text: string;
+      direction: "ltr" | "rtl";
+    };
   }
 ): Promise<string> => {
   const canvas = document.createElement("canvas");
@@ -73,8 +77,7 @@ export const addWatermark = async (
   // Add logo if provided (top left, 150x150)
   if (watermarkConfig.logo) {
     const logo = await loadImage(watermarkConfig.logo);
-    const logoSize = 150;
-    ctx.drawImage(logo, 20, 20, logoSize, logoSize);
+    ctx.drawImage(logo, 20, 20, 150, 150);
   }
   
   // Add overlay if provided (top right, 300x300)
@@ -98,6 +101,33 @@ export const addWatermark = async (
       const y = canvas.height - bottomHeight - 20;
       ctx.drawImage(bottomImg, x, y, bottomWidth, bottomHeight);
     }
+  }
+
+  // Add text overlay
+  if (watermarkConfig.textConfig.text) {
+    ctx.font = "bold 32px Arial";
+    ctx.fillStyle = "white";
+    ctx.textAlign = watermarkConfig.textConfig.direction === "rtl" ? "right" : "left";
+    ctx.textBaseline = "middle";
+    
+    // Add text shadow for better visibility
+    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+
+    const textY = canvas.height - 100; // 100px from bottom
+    const textX = watermarkConfig.textConfig.direction === "rtl" 
+      ? canvas.width - 40  // Right aligned with padding
+      : 40;               // Left aligned with padding
+
+    ctx.fillText(watermarkConfig.textConfig.text, textX, textY);
+
+    // Reset shadow
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
   }
   
   return canvas.toDataURL("image/jpeg", 0.95);
