@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Skeleton } from "./ui/skeleton";
+import { Play } from "lucide-react";
 
 interface ImagePreviewProps {
   src: string;
@@ -20,7 +21,7 @@ export const ImagePreview = ({
       <img
         src={src}
         alt="Preview"
-        className={`w-full h-full object-cover transition-opacity duration-300 ${
+        className={`w-full aspect-square object-cover transition-opacity duration-300 ${
           isLoaded ? "opacity-100" : "opacity-0"
         }`}
         onLoad={() => setIsLoaded(true)}
@@ -28,14 +29,15 @@ export const ImagePreview = ({
       <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
         {isProcessing ? (
           <div className="flex flex-col items-center gap-2">
-            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            <span className="text-white text-sm">Processing...</span>
+            <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <span className="text-white text-sm font-medium">Processing...</span>
           </div>
         ) : (
           <button
             onClick={onProcess}
-            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
           >
+            <Play className="w-4 h-4" />
             Process
           </button>
         )}

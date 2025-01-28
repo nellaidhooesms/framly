@@ -4,13 +4,15 @@ import { ImagePreview } from "./ImagePreview";
 import { createSquareImage, addWatermark } from "../utils/imageProcessing";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
-import { FolderOpen, Play } from "lucide-react";
+import { FolderOpen, Play, Download } from "lucide-react";
 import { WatermarkConfig } from "./WatermarkLayout";
+import { Skeleton } from "./ui/skeleton";
 
 export const ImageProcessor = () => {
   const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
   const [processing, setProcessing] = useState<Set<number>>(new Set());
   const [processedImages, setProcessedImages] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [watermarkConfig, setWatermarkConfig] = useState<WatermarkConfig>({
     bottomImages: [],
     textConfig: {
@@ -33,11 +35,13 @@ export const ImageProcessor = () => {
   }, []);
 
   const handleImagesSelected = (files: File[]) => {
+    setIsLoading(true);
     const newImages = files.map((file) => ({
       file,
       preview: URL.createObjectURL(file),
     }));
     setImages((prev) => [...prev, ...newImages]);
+    setIsLoading(false);
   };
 
   const handleFolderSelect = () => {
@@ -136,9 +140,17 @@ export const ImageProcessor = () => {
         <ImageUploader onImagesSelected={handleImagesSelected} />
       </div>
       
-      {images.length > 0 && (
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="aspect-square">
+              <Skeleton className="w-full h-full rounded-lg" />
+            </div>
+          ))}
+        </div>
+      ) : images.length > 0 ? (
         <>
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-4">
             <Button
               onClick={processAllImages}
               className="w-full sm:w-auto"
@@ -147,6 +159,16 @@ export const ImageProcessor = () => {
               <Play className="mr-2" />
               Process All Images
             </Button>
+            {processedImages.length > 0 && (
+              <Button
+                onClick={downloadAll}
+                variant="secondary"
+                className="w-full sm:w-auto"
+              >
+                <Download className="mr-2" />
+                Download All
+              </Button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -159,20 +181,8 @@ export const ImageProcessor = () => {
               />
             ))}
           </div>
-          
-          {processedImages.length > 0 && (
-            <div className="flex justify-center">
-              <Button
-                onClick={downloadAll}
-                variant="secondary"
-                className="w-full sm:w-auto"
-              >
-                Download All Processed Images
-              </Button>
-            </div>
-          )}
         </>
-      )}
+      ) : null}
     </div>
   );
 };
