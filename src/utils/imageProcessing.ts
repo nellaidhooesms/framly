@@ -62,6 +62,11 @@ export const addWatermark = async (
       text: string;
       direction: "ltr" | "rtl";
     };
+    position?: {
+      x: number;
+      y: number;
+    };
+    opacity?: number;
   }
 ): Promise<string> => {
   const canvas = document.createElement("canvas");
@@ -74,33 +79,56 @@ export const addWatermark = async (
   // Draw original image
   ctx.drawImage(img, 0, 0);
   
-  // Add logo if provided (top left, 150x150)
+  // Calculate positions based on percentages
+  const getPosition = (percent: number, dimension: number) => {
+    return (percent / 100) * dimension;
+  };
+
+  // Add logo if provided
   if (watermarkConfig.logo) {
     const logo = await loadImage(watermarkConfig.logo);
-    ctx.drawImage(logo, 20, 20, 150, 150);
-  }
-  
-  // Add overlay if provided (top right, 300x300)
-  if (watermarkConfig.overlay) {
-    const overlay = await loadImage(watermarkConfig.overlay);
-    ctx.globalAlpha = 0.5;
-    ctx.drawImage(overlay, canvas.width - 320, 20, 300, 300);
+    const x = watermarkConfig.position 
+      ? getPosition(watermarkConfig.position.x, canvas.width - 150)
+      : 20;
+    const y = watermarkConfig.position
+      ? getPosition(watermarkConfig.position.y, canvas.height - 150)
+      : 20;
+    
+    ctx.globalAlpha = watermarkConfig.opacity ?? 1;
+    ctx.drawImage(logo, x, y, 150, 150);
     ctx.globalAlpha = 1;
   }
   
-  // Add bottom images if provided (1080x150)
+  // Add overlay if provided
+  if (watermarkConfig.overlay) {
+    const overlay = await loadImage(watermarkConfig.overlay);
+    const x = watermarkConfig.position
+      ? getPosition(watermarkConfig.position.x, canvas.width - 300)
+      : canvas.width - 320;
+    const y = watermarkConfig.position
+      ? getPosition(watermarkConfig.position.y, canvas.height - 300)
+      : 20;
+    
+    ctx.globalAlpha = watermarkConfig.opacity ?? 0.5;
+    ctx.drawImage(overlay, x, y, 300, 300);
+    ctx.globalAlpha = 1;
+  }
+  
+  // Add bottom images if provided
   if (watermarkConfig.bottomImages.length > 0) {
     const bottomHeight = 150;
-    const bottomWidth = 1080;
+    const bottomWidth = canvas.width / 3;
     const maxImages = Math.min(3, watermarkConfig.bottomImages.length);
     const spacing = 20;
     
+    ctx.globalAlpha = watermarkConfig.opacity ?? 1;
     for (let i = 0; i < maxImages; i++) {
       const bottomImg = await loadImage(watermarkConfig.bottomImages[i]);
       const x = canvas.width - ((i + 1) * (bottomWidth + spacing));
       const y = canvas.height - bottomHeight - 20;
       ctx.drawImage(bottomImg, x, y, bottomWidth, bottomHeight);
     }
+    ctx.globalAlpha = 1;
   }
 
   // Add text overlay
@@ -116,12 +144,19 @@ export const addWatermark = async (
     ctx.shadowOffsetX = 2;
     ctx.shadowOffsetY = 2;
 
-    const textY = canvas.height - 100; // 100px from bottom
-    const textX = watermarkConfig.textConfig.direction === "rtl" 
-      ? canvas.width - 40  // Right aligned with padding
-      : 40;               // Left aligned with padding
+    const x = watermarkConfig.position
+      ? getPosition(watermarkConfig.position.x, canvas.width - 100)
+      : watermarkConfig.textConfig.direction === "rtl"
+      ? canvas.width - 40
+      : 40;
+    
+    const y = watermarkConfig.position
+      ? getPosition(watermarkConfig.position.y, canvas.height - 100)
+      : canvas.height - 100;
 
-    ctx.fillText(watermarkConfig.textConfig.text, textX, textY);
+    ctx.globalAlpha = watermarkConfig.opacity ?? 1;
+    ctx.fillText(watermarkConfig.textConfig.text, x, y);
+    ctx.globalAlpha = 1;
 
     // Reset shadow
     ctx.shadowColor = "transparent";
