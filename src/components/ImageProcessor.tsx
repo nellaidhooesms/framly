@@ -20,6 +20,7 @@ export const ImageProcessor = () => {
   });
 
   useEffect(() => {
+    // Load watermark config from localStorage
     try {
       const savedConfig = localStorage.getItem('watermarkConfig');
       if (savedConfig) {
@@ -37,7 +38,6 @@ export const ImageProcessor = () => {
       preview: URL.createObjectURL(file),
     }));
     setImages((prev) => [...prev, ...newImages]);
-    toast.success(`${files.length} images added successfully`);
   };
 
   const handleFolderSelect = () => {
