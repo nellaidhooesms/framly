@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Skeleton } from "./ui/skeleton";
 import { WatermarkConfig } from "./WatermarkLayout";
 import { Slider } from "./ui/slider";
@@ -18,22 +18,46 @@ export const WatermarkPreview = ({
   onOpacityChange,
 }: WatermarkPreviewProps) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [opacity, setOpacity] = useState(100);
-  const [position, setPosition] = useState({ x: 50, y: 50 });
+  const [opacity, setOpacity] = useState(config.opacity ? config.opacity * 100 : 100);
+  const [position, setPosition] = useState({
+    x: config.position?.x || 50,
+    y: config.position?.y || 50
+  });
+
+  useEffect(() => {
+    if (config.position) {
+      setPosition(config.position);
+    }
+  }, [config.position]);
+
+  useEffect(() => {
+    if (config.opacity !== undefined) {
+      setOpacity(config.opacity * 100);
+    }
+  }, [config.opacity]);
 
   const handleImageLoad = () => {
     setIsLoading(false);
   };
 
   const handleOpacityChange = (value: number[]) => {
-    setOpacity(value[0]);
-    onOpacityChange?.(value[0] / 100);
+    const newOpacity = value[0];
+    setOpacity(newOpacity);
+    onOpacityChange?.(newOpacity / 100);
   };
 
   const handlePositionChange = (axis: "x" | "y", value: number[]) => {
     const newPosition = { ...position, [axis]: value[0] };
     setPosition(newPosition);
     onPositionChange?.(newPosition.x, newPosition.y);
+  };
+
+  const getImageStyle = () => {
+    return {
+      opacity: opacity / 100,
+      transform: `translate(${position.x}%, ${position.y}%)`,
+      transition: 'all 0.2s ease-out'
+    };
   };
 
   return (
@@ -45,6 +69,7 @@ export const WatermarkPreview = ({
             src={imageUrl}
             alt="Preview"
             className="w-full h-full object-contain"
+            style={getImageStyle()}
             onLoad={handleImageLoad}
           />
         ) : (

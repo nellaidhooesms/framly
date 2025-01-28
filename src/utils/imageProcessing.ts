@@ -79,54 +79,37 @@ export const addWatermark = async (
   // Draw original image
   ctx.drawImage(img, 0, 0);
   
-  // Calculate positions based on percentages
-  const getPosition = (percent: number, dimension: number) => {
-    return (percent / 100) * dimension;
-  };
-
-  // Add logo if provided
+  // Add logo if provided (top left)
   if (watermarkConfig.logo) {
     const logo = await loadImage(watermarkConfig.logo);
-    const x = watermarkConfig.position 
-      ? getPosition(watermarkConfig.position.x, canvas.width - 150)
-      : 20;
-    const y = watermarkConfig.position
-      ? getPosition(watermarkConfig.position.y, canvas.height - 150)
-      : 20;
-    
     ctx.globalAlpha = watermarkConfig.opacity ?? 1;
-    ctx.drawImage(logo, x, y, 150, 150);
+    ctx.drawImage(logo, 20, 20, 150, 150);
     ctx.globalAlpha = 1;
   }
   
-  // Add overlay if provided
+  // Add overlay if provided (top right)
   if (watermarkConfig.overlay) {
     const overlay = await loadImage(watermarkConfig.overlay);
-    const x = watermarkConfig.position
-      ? getPosition(watermarkConfig.position.x, canvas.width - 300)
-      : canvas.width - 320;
-    const y = watermarkConfig.position
-      ? getPosition(watermarkConfig.position.y, canvas.height - 300)
-      : 20;
-    
+    const x = canvas.width - 320; // 300px width + 20px margin
     ctx.globalAlpha = watermarkConfig.opacity ?? 0.5;
-    ctx.drawImage(overlay, x, y, 300, 300);
+    ctx.drawImage(overlay, x, 20, 300, 300);
     ctx.globalAlpha = 1;
   }
   
-  // Add bottom images if provided
+  // Add bottom images if provided (1080px x 150px)
   if (watermarkConfig.bottomImages.length > 0) {
     const bottomHeight = 150;
-    const bottomWidth = canvas.width / 3;
+    const bottomWidth = Math.min(1080, canvas.width);
     const maxImages = Math.min(3, watermarkConfig.bottomImages.length);
     const spacing = 20;
+    const startY = canvas.height - bottomHeight - 20;
     
     ctx.globalAlpha = watermarkConfig.opacity ?? 1;
     for (let i = 0; i < maxImages; i++) {
       const bottomImg = await loadImage(watermarkConfig.bottomImages[i]);
-      const x = canvas.width - ((i + 1) * (bottomWidth + spacing));
-      const y = canvas.height - bottomHeight - 20;
-      ctx.drawImage(bottomImg, x, y, bottomWidth, bottomHeight);
+      const sectionWidth = (bottomWidth - (spacing * (maxImages - 1))) / maxImages;
+      const x = (canvas.width - bottomWidth) / 2 + (i * (sectionWidth + spacing));
+      ctx.drawImage(bottomImg, x, startY, sectionWidth, bottomHeight);
     }
     ctx.globalAlpha = 1;
   }
@@ -138,27 +121,20 @@ export const addWatermark = async (
     ctx.textAlign = watermarkConfig.textConfig.direction === "rtl" ? "right" : "left";
     ctx.textBaseline = "middle";
     
-    // Add text shadow for better visibility
     ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
     ctx.shadowBlur = 4;
     ctx.shadowOffsetX = 2;
     ctx.shadowOffsetY = 2;
 
-    const x = watermarkConfig.position
-      ? getPosition(watermarkConfig.position.x, canvas.width - 100)
-      : watermarkConfig.textConfig.direction === "rtl"
+    const x = watermarkConfig.textConfig.direction === "rtl"
       ? canvas.width - 40
       : 40;
-    
-    const y = watermarkConfig.position
-      ? getPosition(watermarkConfig.position.y, canvas.height - 100)
-      : canvas.height - 100;
+    const y = canvas.height - 50;
 
     ctx.globalAlpha = watermarkConfig.opacity ?? 1;
     ctx.fillText(watermarkConfig.textConfig.text, x, y);
     ctx.globalAlpha = 1;
 
-    // Reset shadow
     ctx.shadowColor = "transparent";
     ctx.shadowBlur = 0;
     ctx.shadowOffsetX = 0;
