@@ -1,5 +1,6 @@
 import JSZip from 'jszip';
 import { FilterConfig } from '../components/ImageFilters';
+import { WatermarkConfig } from '../components/WatermarkLayout';
 
 export const createSquareImage = async (
   originalImage: HTMLImageElement,
@@ -83,20 +84,8 @@ export const createSquareImage = async (
 
 export const addWatermark = async (
   image: string,
-  watermarkConfig: {
-    logo?: string;
-    overlay?: string;
-    bottomImages: string[];
-    textConfig: {
-      text: string;
-      direction: "ltr" | "rtl";
-    };
-    position?: {
-      x: number;
-      y: number;
-    };
-    opacity?: number;
-  }
+  watermarkConfig: WatermarkConfig,
+  outputFormat: string = 'image/jpeg'
 ): Promise<string> => {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
@@ -164,7 +153,8 @@ export const addWatermark = async (
     ctx.shadowOffsetY = 0;
   }
   
-  return canvas.toDataURL("image/jpeg", 0.95);
+  const quality = outputFormat === 'image/jpeg' ? 0.95 : undefined;
+  return canvas.toDataURL(outputFormat, quality);
 };
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {

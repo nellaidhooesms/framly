@@ -1,19 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ImageUploader } from "./ImageUploader";
 import { ImagePreview } from "./ImagePreview";
 import { createSquareImage, addWatermark, downloadAsZip } from "../utils/imageProcessing";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
-import { FolderOpen, Play, Download, Archive } from "lucide-react";
+import { FolderOpen, ChevronDown, ChevronUp } from "lucide-react";
 import { WatermarkConfig } from "./WatermarkLayout";
 import { Skeleton } from "./ui/skeleton";
 import { ImageFilters, FilterConfig } from "./ImageFilters";
+import { ProcessingControls } from "./ProcessingControls";
+import { ImageControls } from "./ImageControls";
 
 export const ImageProcessor = () => {
   const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
   const [processing, setProcessing] = useState<Set<number>>(new Set());
   const [processedImages, setProcessedImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [outputFormat, setOutputFormat] = useState("image/jpeg");
+  const [imageSize, setImageSize] = useState(1080);
   const [watermarkConfig, setWatermarkConfig] = useState<WatermarkConfig>({
     bottomImages: [],
     textConfig: {
@@ -85,8 +90,8 @@ export const ImageProcessor = () => {
         img.onload = resolve;
       });
 
-      const squareImage = await createSquareImage(img, 1080, filterConfig);
-      const finalImage = await addWatermark(squareImage, watermarkConfig);
+      const squareImage = await createSquareImage(img, imageSize, filterConfig);
+      const finalImage = await addWatermark(squareImage, watermarkConfig, outputFormat);
 
       setProcessedImages((prev) => {
         const next = [...prev];
@@ -142,65 +147,76 @@ export const ImageProcessor = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Image Processing</h2>
         <Button
-          onClick={handleFolderSelect}
-          variant="outline"
-          className="w-full sm:w-auto"
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsExpanded(!isExpanded)}
         >
-          <FolderOpen className="mr-2" />
-          Open Folder
+          {isExpanded ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
         </Button>
-        <ImageUploader onImagesSelected={handleImagesSelected} />
       </div>
-      
-      {images.length > 0 && (
-        <ImageFilters config={filterConfig} onChange={setFilterConfig} />
-      )}
-      
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="aspect-square">
-              <Skeleton className="w-full h-full rounded-lg" />
-            </div>
-          ))}
-        </div>
-      ) : images.length > 0 ? (
-        <>
-          <div className="flex justify-center gap-4">
-            <Button
-              onClick={processAllImages}
-              className="w-full sm:w-auto"
-              disabled={processing.size > 0}
-            >
-              <Play className="mr-2" />
-              Process All Images
-            </Button>
-            {processedImages.length > 0 && (
-              <Button
-                onClick={downloadAll}
-                variant="secondary"
-                className="w-full sm:w-auto"
-              >
-                <Archive className="mr-2" />
-                Download ZIP
-              </Button>
-            )}
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {images.map((image, index) => (
-              <ImagePreview
-                key={index}
-                src={processedImages[index] || image.preview}
-                onProcess={() => processImage(index)}
-                isProcessing={processing.has(index)}
-              />
-            ))}
+      {isExpanded && (
+        <>
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+            <Button
+              onClick={handleFolderSelect}
+              variant="outline"
+              className="w-full sm:w-auto"
+            >
+              <FolderOpen className="mr-2" />
+              Open Folder
+            </Button>
+            <ImageUploader onImagesSelected={handleImagesSelected} />
           </div>
+          
+          {images.length > 0 && (
+            <>
+              <ImageControls
+                format={outputFormat}
+                onFormatChange={setOutputFormat}
+                size={imageSize}
+                onSizeChange={setImageSize}
+              />
+              <ImageFilters config={filterConfig} onChange={setFilterConfig} />
+              <ProcessingControls
+                onProcessAll={processAllImages}
+                onDownloadAll={downloadAll}
+                hasImages={images.length > 0}
+                hasProcessedImages={processedImages.length > 0}
+                isProcessing={processing.size > 0}
+              />
+            </>
+          )}
+          
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="aspect-square">
+                  <Skeleton className="w-full h-full rounded-lg" />
+                </div>
+              ))}
+            </div>
+          ) : images.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {images.map((image, index) => (
+                <ImagePreview
+                  key={index}
+                  src={processedImages[index] || image.preview}
+                  onProcess={() => processImage(index)}
+                  isProcessing={processing.has(index)}
+                />
+              ))}
+            </div>
+          ) : null}
         </>
-      ) : null}
+      )}
     </div>
   );
 };
