@@ -94,7 +94,7 @@ export const addWatermark = async (
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
   const img = await loadImage(image);
-  const size = img.width; // Use the image width as reference for scaling
+  const size = img.width;
   
   canvas.width = size;
   canvas.height = size;
@@ -105,14 +105,14 @@ export const addWatermark = async (
   // Add logo if provided (top left)
   if (watermarkConfig.logo) {
     const logo = await loadImage(watermarkConfig.logo);
-    const logoSize = size * 0.15; // Scale logo relative to image size
+    const logoSize = size * 0.15;
     ctx.drawImage(logo, 20, 20, logoSize, logoSize);
   }
   
   // Add overlay if provided (middle)
   if (watermarkConfig.overlay) {
     const overlay = await loadImage(watermarkConfig.overlay);
-    const overlaySize = size * 0.3; // Scale overlay relative to image size
+    const overlaySize = size * 0.3;
     const x = size - overlaySize - 20;
     ctx.globalAlpha = watermarkConfig.opacity ?? 0.5;
     ctx.drawImage(overlay, x, 20, overlaySize, overlaySize);
@@ -121,10 +121,10 @@ export const addWatermark = async (
   
   // Add bottom images if provided
   if (watermarkConfig.bottomImages.length > 0) {
-    const bottomHeight = size * 0.15; // Scale bottom images height relative to image size
-    const bottomWidth = Math.min(size, size * 0.8); // Limit width to 80% of image size
+    const bottomHeight = size * 0.15;
+    const bottomWidth = Math.min(size, size * 0.8);
     const maxImages = Math.min(3, watermarkConfig.bottomImages.length);
-    const spacing = size * 0.02; // Scale spacing relative to image size
+    const spacing = size * 0.02;
     const startY = size - bottomHeight - spacing;
     
     for (let i = 0; i < maxImages; i++) {
@@ -135,10 +135,11 @@ export const addWatermark = async (
     }
   }
 
-  // Add text overlay with scaled font size
+  // Add text overlay with custom font
   if (watermarkConfig.textConfig.text) {
-    const fontSize = size * 0.03; // Scale font size relative to image size
-    ctx.font = `bold ${fontSize}px Arial`;
+    const fontSize = size * 0.03;
+    const font = watermarkConfig.textConfig.font || 'Arial';
+    ctx.font = `bold ${fontSize}px ${font}`;
     ctx.fillStyle = "white";
     ctx.textAlign = watermarkConfig.textConfig.direction === "rtl" ? "right" : "left";
     ctx.textBaseline = "middle";
@@ -151,7 +152,7 @@ export const addWatermark = async (
     const x = watermarkConfig.textConfig.direction === "rtl"
       ? size - 40
       : 40;
-    const y = size - (size * 0.05); // Position text relative to image size
+    const y = size - (size * 0.05);
 
     ctx.fillText(watermarkConfig.textConfig.text, x, y);
 
