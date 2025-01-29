@@ -1,8 +1,10 @@
 import JSZip from 'jszip';
+import { FilterConfig } from '../components/ImageFilters';
 
 export const createSquareImage = async (
   originalImage: HTMLImageElement,
-  size: number = 1080
+  size: number = 1080,
+  filterConfig?: FilterConfig
 ): Promise<string> => {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
@@ -49,6 +51,31 @@ export const createSquareImage = async (
     const x = (size - scaledWidth) / 2;
     const y = (size - scaledHeight) / 2;
     ctx.drawImage(originalImage, x, y, scaledWidth, scaledHeight);
+  }
+
+  // Apply filters if provided
+  if (filterConfig) {
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    
+    // Apply CSS filters using a temporary canvas
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d')!;
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    
+    let filterString = '';
+    if (filterConfig.brightness !== 100) filterString += `brightness(${filterConfig.brightness}%) `;
+    if (filterConfig.contrast !== 100) filterString += `contrast(${filterConfig.contrast}%) `;
+    if (filterConfig.saturation !== 100) filterString += `saturate(${filterConfig.saturation}%) `;
+    if (filterConfig.blur > 0) filterString += `blur(${filterConfig.blur}px) `;
+    if (filterConfig.filter !== 'none') filterString += `${filterConfig.filter}(100%) `;
+    
+    tempCtx.filter = filterString.trim();
+    tempCtx.drawImage(canvas, 0, 0);
+    
+    // Copy back to main canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(tempCanvas, 0, 0);
   }
 
   return canvas.toDataURL("image/jpeg", 0.95);

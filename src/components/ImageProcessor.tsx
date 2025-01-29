@@ -7,6 +7,7 @@ import { Button } from "./ui/button";
 import { FolderOpen, Play, Download, Archive } from "lucide-react";
 import { WatermarkConfig } from "./WatermarkLayout";
 import { Skeleton } from "./ui/skeleton";
+import { ImageFilters, FilterConfig } from "./ImageFilters";
 
 export const ImageProcessor = () => {
   const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
@@ -19,6 +20,13 @@ export const ImageProcessor = () => {
       text: "",
       direction: "ltr"
     }
+  });
+  const [filterConfig, setFilterConfig] = useState<FilterConfig>({
+    brightness: 100,
+    contrast: 100,
+    saturation: 100,
+    blur: 0,
+    filter: "none"
   });
 
   useEffect(() => {
@@ -77,7 +85,7 @@ export const ImageProcessor = () => {
         img.onload = resolve;
       });
 
-      const squareImage = await createSquareImage(img);
+      const squareImage = await createSquareImage(img, 1080, filterConfig);
       const finalImage = await addWatermark(squareImage, watermarkConfig);
 
       setProcessedImages((prev) => {
@@ -145,6 +153,10 @@ export const ImageProcessor = () => {
         </Button>
         <ImageUploader onImagesSelected={handleImagesSelected} />
       </div>
+      
+      {images.length > 0 && (
+        <ImageFilters config={filterConfig} onChange={setFilterConfig} />
+      )}
       
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
