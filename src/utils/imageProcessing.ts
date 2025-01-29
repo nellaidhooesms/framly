@@ -1,3 +1,5 @@
+import JSZip from 'jszip';
+
 export const createSquareImage = async (
   originalImage: HTMLImageElement,
   size: number = 1080
@@ -82,9 +84,7 @@ export const addWatermark = async (
   // Add logo if provided (top left)
   if (watermarkConfig.logo) {
     const logo = await loadImage(watermarkConfig.logo);
-    ctx.globalAlpha = watermarkConfig.opacity ?? 1;
     ctx.drawImage(logo, 20, 20, 150, 150);
-    ctx.globalAlpha = 1;
   }
   
   // Add overlay if provided (top right)
@@ -104,14 +104,12 @@ export const addWatermark = async (
     const spacing = 20;
     const startY = canvas.height - bottomHeight - 20;
     
-    ctx.globalAlpha = watermarkConfig.opacity ?? 1;
     for (let i = 0; i < maxImages; i++) {
       const bottomImg = await loadImage(watermarkConfig.bottomImages[i]);
       const sectionWidth = (bottomWidth - (spacing * (maxImages - 1))) / maxImages;
       const x = (canvas.width - bottomWidth) / 2 + (i * (sectionWidth + spacing));
       ctx.drawImage(bottomImg, x, startY, sectionWidth, bottomHeight);
     }
-    ctx.globalAlpha = 1;
   }
 
   // Add text overlay
@@ -131,9 +129,7 @@ export const addWatermark = async (
       : 40;
     const y = canvas.height - 50;
 
-    ctx.globalAlpha = watermarkConfig.opacity ?? 1;
     ctx.fillText(watermarkConfig.textConfig.text, x, y);
-    ctx.globalAlpha = 1;
 
     ctx.shadowColor = "transparent";
     ctx.shadowBlur = 0;
@@ -150,4 +146,29 @@ const loadImage = (src: string): Promise<HTMLImageElement> => {
     img.onload = () => resolve(img);
     img.src = src;
   });
+};
+
+export const downloadAsZip = async (images: string[], filename: string = 'processed-images.zip') => {
+  const zip = new JSZip();
+  
+  images.forEach((imageData, index) => {
+    // Convert base64 to binary
+    const data = atob(imageData.split(',')[1]);
+    const array = new Uint8Array(data.length);
+    for (let i = 0; i < data.length; i++) {
+      array[i] = data.charCodeAt(i);
+    }
+    
+    zip.file(`image-${index + 1}.jpg`, array);
+  });
+  
+  const content = await zip.generateAsync({ type: 'blob' });
+  const url = URL.createObjectURL(content);
+  
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  
+  URL.revokeObjectURL(url);
 };

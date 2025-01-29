@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { ImageUploader } from "./ImageUploader";
 import { ImagePreview } from "./ImagePreview";
-import { createSquareImage, addWatermark } from "../utils/imageProcessing";
+import { createSquareImage, addWatermark, downloadAsZip } from "../utils/imageProcessing";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
-import { FolderOpen, Play, Download } from "lucide-react";
+import { FolderOpen, Play, Download, Archive } from "lucide-react";
 import { WatermarkConfig } from "./WatermarkLayout";
 import { Skeleton } from "./ui/skeleton";
 
@@ -117,13 +117,19 @@ export const ImageProcessor = () => {
   };
 
   const downloadAll = () => {
-    processedImages.forEach((image, index) => {
-      const link = document.createElement("a");
-      link.href = image;
-      link.download = `processed-image-${index + 1}.jpg`;
-      link.click();
-    });
-    toast.success("All processed images downloaded");
+    if (processedImages.length === 0) {
+      toast.error("No processed images to download");
+      return;
+    }
+    
+    toast.promise(
+      downloadAsZip(processedImages),
+      {
+        loading: 'Creating ZIP file...',
+        success: 'Images downloaded successfully',
+        error: 'Failed to create ZIP file'
+      }
+    );
   };
 
   return (
@@ -165,8 +171,8 @@ export const ImageProcessor = () => {
                 variant="secondary"
                 className="w-full sm:w-auto"
               >
-                <Download className="mr-2" />
-                Download All
+                <Archive className="mr-2" />
+                Download ZIP
               </Button>
             )}
           </div>
