@@ -56,9 +56,6 @@ export const createSquareImage = async (
 
   // Apply filters if provided
   if (filterConfig) {
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    
-    // Apply CSS filters using a temporary canvas
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d')!;
     tempCanvas.width = canvas.width;
@@ -74,12 +71,19 @@ export const createSquareImage = async (
     tempCtx.filter = filterString.trim();
     tempCtx.drawImage(canvas, 0, 0);
     
-    // Copy back to main canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(tempCanvas, 0, 0);
   }
 
   return canvas.toDataURL("image/jpeg", 0.95);
+};
+
+const loadImage = (src: string): Promise<HTMLImageElement> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.src = src;
+  });
 };
 
 export const addWatermark = async (
@@ -90,47 +94,51 @@ export const addWatermark = async (
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
   const img = await loadImage(image);
+  const size = img.width; // Use the image width as reference for scaling
   
-  canvas.width = img.width;
-  canvas.height = img.height;
+  canvas.width = size;
+  canvas.height = size;
   
   // Draw original image
-  ctx.drawImage(img, 0, 0);
+  ctx.drawImage(img, 0, 0, size, size);
   
   // Add logo if provided (top left)
   if (watermarkConfig.logo) {
     const logo = await loadImage(watermarkConfig.logo);
-    ctx.drawImage(logo, 20, 20, 150, 150);
+    const logoSize = size * 0.15; // Scale logo relative to image size
+    ctx.drawImage(logo, 20, 20, logoSize, logoSize);
   }
   
-  // Add overlay if provided (top right)
+  // Add overlay if provided (middle)
   if (watermarkConfig.overlay) {
     const overlay = await loadImage(watermarkConfig.overlay);
-    const x = canvas.width - 320; // 300px width + 20px margin
+    const overlaySize = size * 0.3; // Scale overlay relative to image size
+    const x = size - overlaySize - 20;
     ctx.globalAlpha = watermarkConfig.opacity ?? 0.5;
-    ctx.drawImage(overlay, x, 20, 300, 300);
+    ctx.drawImage(overlay, x, 20, overlaySize, overlaySize);
     ctx.globalAlpha = 1;
   }
   
-  // Add bottom images if provided (1080px x 150px)
+  // Add bottom images if provided
   if (watermarkConfig.bottomImages.length > 0) {
-    const bottomHeight = 150;
-    const bottomWidth = Math.min(1080, canvas.width);
+    const bottomHeight = size * 0.15; // Scale bottom images height relative to image size
+    const bottomWidth = Math.min(size, size * 0.8); // Limit width to 80% of image size
     const maxImages = Math.min(3, watermarkConfig.bottomImages.length);
-    const spacing = 20;
-    const startY = canvas.height - bottomHeight - 20;
+    const spacing = size * 0.02; // Scale spacing relative to image size
+    const startY = size - bottomHeight - spacing;
     
     for (let i = 0; i < maxImages; i++) {
       const bottomImg = await loadImage(watermarkConfig.bottomImages[i]);
       const sectionWidth = (bottomWidth - (spacing * (maxImages - 1))) / maxImages;
-      const x = (canvas.width - bottomWidth) / 2 + (i * (sectionWidth + spacing));
+      const x = (size - bottomWidth) / 2 + (i * (sectionWidth + spacing));
       ctx.drawImage(bottomImg, x, startY, sectionWidth, bottomHeight);
     }
   }
 
-  // Add text overlay
+  // Add text overlay with scaled font size
   if (watermarkConfig.textConfig.text) {
-    ctx.font = "bold 32px Arial";
+    const fontSize = size * 0.03; // Scale font size relative to image size
+    ctx.font = `bold ${fontSize}px Arial`;
     ctx.fillStyle = "white";
     ctx.textAlign = watermarkConfig.textConfig.direction === "rtl" ? "right" : "left";
     ctx.textBaseline = "middle";
@@ -141,9 +149,9 @@ export const addWatermark = async (
     ctx.shadowOffsetY = 2;
 
     const x = watermarkConfig.textConfig.direction === "rtl"
-      ? canvas.width - 40
+      ? size - 40
       : 40;
-    const y = canvas.height - 50;
+    const y = size - (size * 0.05); // Position text relative to image size
 
     ctx.fillText(watermarkConfig.textConfig.text, x, y);
 
@@ -157,19 +165,10 @@ export const addWatermark = async (
   return canvas.toDataURL(outputFormat, quality);
 };
 
-const loadImage = (src: string): Promise<HTMLImageElement> => {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.src = src;
-  });
-};
-
 export const downloadAsZip = async (images: string[], filename: string = 'processed-images.zip') => {
   const zip = new JSZip();
   
   images.forEach((imageData, index) => {
-    // Convert base64 to binary
     const data = atob(imageData.split(',')[1]);
     const array = new Uint8Array(data.length);
     for (let i = 0; i < data.length; i++) {

@@ -4,7 +4,7 @@ import { ImagePreview } from "./ImagePreview";
 import { createSquareImage, addWatermark, downloadAsZip } from "../utils/imageProcessing";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
-import { FolderOpen, ChevronDown, ChevronUp } from "lucide-react";
+import { FolderOpen, ChevronDown, ChevronUp, Eye, EyeOff } from "lucide-react";
 import { WatermarkConfig } from "./WatermarkLayout";
 import { Skeleton } from "./ui/skeleton";
 import { ImageFilters, FilterConfig } from "./ImageFilters";
@@ -17,6 +17,7 @@ export const ImageProcessor = () => {
   const [processedImages, setProcessedImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
+  const [showControls, setShowControls] = useState(true);
   const [outputFormat, setOutputFormat] = useState("image/jpeg");
   const [imageSize, setImageSize] = useState(1080);
   const [watermarkConfig, setWatermarkConfig] = useState<WatermarkConfig>({
@@ -35,7 +36,6 @@ export const ImageProcessor = () => {
   });
 
   useEffect(() => {
-    // Load watermark config from localStorage
     try {
       const savedConfig = localStorage.getItem('watermarkConfig');
       if (savedConfig) {
@@ -149,49 +149,67 @@ export const ImageProcessor = () => {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Image Processing</h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
-          {isExpanded ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowControls(!showControls)}
+            title={showControls ? "Hide controls" : "Show controls"}
+          >
+            {showControls ? (
+              <Eye className="h-4 w-4" />
+            ) : (
+              <EyeOff className="h-4 w-4" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </div>
 
       {isExpanded && (
         <>
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-            <Button
-              onClick={handleFolderSelect}
-              variant="outline"
-              className="w-full sm:w-auto"
-            >
-              <FolderOpen className="mr-2" />
-              Open Folder
-            </Button>
-            <ImageUploader onImagesSelected={handleImagesSelected} />
-          </div>
-          
-          {images.length > 0 && (
+          {showControls && (
             <>
-              <ImageControls
-                format={outputFormat}
-                onFormatChange={setOutputFormat}
-                size={imageSize}
-                onSizeChange={setImageSize}
-              />
-              <ImageFilters config={filterConfig} onChange={setFilterConfig} />
-              <ProcessingControls
-                onProcessAll={processAllImages}
-                onDownloadAll={downloadAll}
-                hasImages={images.length > 0}
-                hasProcessedImages={processedImages.length > 0}
-                isProcessing={processing.size > 0}
-              />
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+                <Button
+                  onClick={handleFolderSelect}
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                >
+                  <FolderOpen className="mr-2" />
+                  Open Folder
+                </Button>
+                <ImageUploader onImagesSelected={handleImagesSelected} />
+              </div>
+              
+              {images.length > 0 && (
+                <>
+                  <ImageControls
+                    format={outputFormat}
+                    onFormatChange={setOutputFormat}
+                    size={imageSize}
+                    onSizeChange={setImageSize}
+                  />
+                  <ImageFilters config={filterConfig} onChange={setFilterConfig} />
+                  <ProcessingControls
+                    onProcessAll={processAllImages}
+                    onDownloadAll={downloadAll}
+                    hasImages={images.length > 0}
+                    hasProcessedImages={processedImages.length > 0}
+                    isProcessing={processing.size > 0}
+                  />
+                </>
+              )}
             </>
           )}
           
