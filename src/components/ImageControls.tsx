@@ -16,11 +16,11 @@ export const ImageControls = ({
   onSizeChange,
 }: ImageControlsProps) => {
   return (
-    <div className="space-y-4 p-4 border rounded-lg">
+    <div className="space-y-4 p-4 border rounded-lg w-full">
       <div className="space-y-2">
         <Label>Output Format</Label>
         <Select value={format} onValueChange={onFormatChange}>
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Select format" />
           </SelectTrigger>
           <SelectContent>

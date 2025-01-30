@@ -17,22 +17,22 @@ export const ProcessingControls = ({
   isProcessing,
 }: ProcessingControlsProps) => {
   return (
-    <div className="flex justify-center gap-4">
+    <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4 w-full">
       <Button
         onClick={onProcessAll}
-        className="w-full sm:w-auto"
+        className="w-full"
         disabled={!hasImages || isProcessing}
       >
-        <Play className="mr-2" />
+        <Play className="mr-2 h-4 w-4" />
         Process All Images
       </Button>
       {hasProcessedImages && (
         <Button
           onClick={onDownloadAll}
           variant="secondary"
-          className="w-full sm:w-auto"
+          className="w-full"
         >
-          <Archive className="mr-2" />
+          <Archive className="mr-2 h-4 w-4" />
           Download ZIP
         </Button>
       )}

@@ -7,7 +7,6 @@ const WatermarkConfig = () => {
 
   const handleSave = (config: WatermarkConfigType) => {
     try {
-      // Compress the images before saving to localStorage
       const compressedConfig = {
         ...config,
         logo: config.logo ? compressImage(config.logo) : undefined,
@@ -15,7 +14,6 @@ const WatermarkConfig = () => {
         bottomImages: config.bottomImages.map(img => compressImage(img))
       };
 
-      // Save to localStorage
       localStorage.setItem('watermarkConfig', JSON.stringify(compressedConfig));
       toast.success("Watermark configuration saved successfully");
       navigate('/');
@@ -25,20 +23,17 @@ const WatermarkConfig = () => {
     }
   };
 
-  // Helper function to compress base64 images
   const compressImage = (base64: string): string => {
     const canvas = document.createElement('canvas');
     const img = new Image();
     img.src = base64;
     
-    // Set maximum dimensions
     const maxWidth = 800;
     const maxHeight = 800;
     
     let width = img.width;
     let height = img.height;
     
-    // Calculate new dimensions
     if (width > height) {
       if (width > maxWidth) {
         height = Math.round((height * maxWidth) / width);
@@ -57,14 +52,13 @@ const WatermarkConfig = () => {
     const ctx = canvas.getContext('2d')!;
     ctx.drawImage(img, 0, 0, width, height);
     
-    // Compress image to JPEG with lower quality
     return canvas.toDataURL('image/jpeg', 0.5);
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-8">
+    <div className="min-h-screen bg-background text-foreground p-4 sm:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold text-center">Watermark Configuration</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-center">Watermark Configuration</h1>
         <p className="text-center text-muted-foreground">
           Configure your watermark layout including logo, overlay, and bottom images.
         </p>

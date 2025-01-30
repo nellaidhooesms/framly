@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Save, Plus, Download, Upload } from "lucide-react";
+import { Save, Download, Upload } from "lucide-react";
 import { WatermarkConfig } from "./WatermarkLayout";
 import { toast } from "sonner";
 
@@ -94,24 +94,26 @@ export const TemplateSystem = ({
     input.type = 'file';
     input.accept = '.json';
     input.onchange = (e: Event) => {
-      const target = e.target as HTMLInputElement;
-      if (target.files && target.files.length > 0) {
-        importConfigurations({
-          target,
-          currentTarget: target,
-          nativeEvent: e,
+      if (e.target instanceof HTMLInputElement && e.target.files && e.target.files.length > 0) {
+        const syntheticEvent = {
+          target: e.target,
+          currentTarget: e.target,
           preventDefault: () => e.preventDefault(),
           stopPropagation: () => e.stopPropagation(),
-          isPropagationStopped: () => false,
-          isDefaultPrevented: () => false,
-          persist: () => {},
+          nativeEvent: e,
           bubbles: e.bubbles,
           cancelable: e.cancelable,
+          defaultPrevented: e.defaultPrevented,
           eventPhase: e.eventPhase,
           isTrusted: e.isTrusted,
           timeStamp: e.timeStamp,
-          type: e.type
-        });
+          type: e.type,
+          isDefaultPrevented: () => false,
+          isPropagationStopped: () => false,
+          persist: () => {}
+        } as React.ChangeEvent<HTMLInputElement>;
+        
+        importConfigurations(syntheticEvent);
       }
     };
     input.click();
@@ -119,13 +121,14 @@ export const TemplateSystem = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-center gap-2">
         <Input
           placeholder="Template name"
           value={newTemplateName}
           onChange={(e) => setNewTemplateName(e.target.value)}
+          className="w-full"
         />
-        <Button onClick={saveTemplate} className="whitespace-nowrap">
+        <Button onClick={saveTemplate} className="w-full sm:w-auto whitespace-nowrap">
           <Save className="w-4 h-4 mr-2" />
           Save Template
         </Button>
@@ -140,7 +143,7 @@ export const TemplateSystem = ({
           }
         }}
       >
-        <SelectTrigger>
+        <SelectTrigger className="w-full">
           <SelectValue placeholder="Load template" />
         </SelectTrigger>
         <SelectContent>
@@ -152,7 +155,7 @@ export const TemplateSystem = ({
         </SelectContent>
       </Select>
 
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <Button onClick={exportConfigurations} variant="outline" className="w-full">
           <Download className="w-4 h-4 mr-2" />
           Export Configurations

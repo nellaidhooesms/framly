@@ -8,24 +8,23 @@ const Index = () => {
   const navigate = useNavigate();
 
   const handleReset = () => {
-    // Clear local storage or any saved state
     localStorage.removeItem('watermarkConfig');
     window.location.reload();
     toast.success("All images and settings have been reset");
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-8">
+    <div className="min-h-screen bg-background text-foreground p-4 sm:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Social Media Image Processor</h1>
-          <div className="flex gap-4">
-            <Button variant="outline" onClick={handleReset}>
-              <Trash2 className="mr-2" />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h1 className="text-2xl sm:text-3xl font-bold">Social Media Image Processor</h1>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
+            <Button variant="outline" onClick={handleReset} className="w-full sm:w-auto">
+              <Trash2 className="mr-2 h-4 w-4" />
               Reset All
             </Button>
-            <Button onClick={() => navigate('/watermark-config')}>
-              <Settings className="mr-2" />
+            <Button onClick={() => navigate('/watermark-config')} className="w-full sm:w-auto">
+              <Settings className="mr-2 h-4 w-4" />
               Watermark Settings
             </Button>
           </div>
