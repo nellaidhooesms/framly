@@ -1,4 +1,5 @@
 import { WatermarkConfig } from "../../components/WatermarkLayout";
+import { ProcessedImage } from "./types";
 import { createCanvas, hasTransparency } from "./canvas";
 import { addLogo } from "./watermarkLogo";
 import { addOverlay } from "./watermarkOverlay";
