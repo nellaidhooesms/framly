@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { TextConfiguration } from "../components/watermark/TextConfiguration";
 import { useState } from "react";
+import { ImagePreview } from "../components/ImagePreview";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -83,7 +84,11 @@ const Index = () => {
               Upload your images to process them for social media - includes square cropping, 
               background blur for portrait images, and watermarking.
             </p>
-            <ImageProcessor />
+            <ImageProcessor 
+              text={text}
+              textDirection={textDirection}
+              selectedFont={selectedFont}
+            />
           </div>
         </div>
       </div>

@@ -6,12 +6,18 @@ interface ImagePreviewProps {
   src: string;
   onProcess: () => void;
   isProcessing: boolean;
+  text?: string;
+  textDirection?: "ltr" | "rtl";
+  selectedFont?: string;
 }
 
 export const ImagePreview = ({
   src,
   onProcess,
   isProcessing,
+  text,
+  textDirection,
+  selectedFont,
 }: ImagePreviewProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -26,6 +32,18 @@ export const ImagePreview = ({
         }`}
         onLoad={() => setIsLoaded(true)}
       />
+      {text && (
+        <div
+          className="absolute bottom-0 left-0 right-0 p-4 bg-black/50"
+          style={{
+            fontFamily: selectedFont,
+            direction: textDirection,
+            textAlign: textDirection === "rtl" ? "right" : "left",
+          }}
+        >
+          <p className="text-white break-words">{text}</p>
+        </div>
+      )}
       <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
         {isProcessing ? (
           <div className="flex flex-col items-center gap-2">
