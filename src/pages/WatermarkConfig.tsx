@@ -1,6 +1,8 @@
 import { WatermarkLayout, WatermarkConfig as WatermarkConfigType } from "../components/WatermarkLayout";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const WatermarkConfig = () => {
   const navigate = useNavigate();
@@ -58,8 +60,13 @@ const WatermarkConfig = () => {
   return (
     <div className="min-h-screen bg-background text-foreground p-4 sm:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-center">Watermark Configuration</h1>
-        <p className="text-center text-muted-foreground">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={() => navigate('/')} className="p-2">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-2xl sm:text-3xl font-bold">Watermark Configuration</h1>
+        </div>
+        <p className="text-muted-foreground">
           Configure your watermark layout including logo, overlay, and bottom images.
         </p>
         <WatermarkLayout onSave={handleSave} />
