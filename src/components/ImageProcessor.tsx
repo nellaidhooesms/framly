@@ -69,21 +69,21 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
         img.src = image;
         await new Promise((resolve) => (img.onload = resolve));
 
-        let processedImage = await createSquareImage(img, size, filterConfig);
+        const squareResult = await createSquareImage(img, size, filterConfig);
 
         // Use selected template if available, otherwise fall back to saved config
         const watermarkConfig = selectedTemplate !== "default"
           ? templates[selectedTemplate]
           : JSON.parse(localStorage.getItem("watermarkConfig") || "{}");
 
-        processedImage = await addWatermark(
-          processedImage, 
+        const watermarkResult = await addWatermark(
+          squareResult.dataUrl,
           watermarkConfig,
           text,
           textDirection,
           selectedFont
         );
-        processed.push(processedImage);
+        processed.push(watermarkResult.dataUrl);
       }
 
       setProcessedImages(processed);
