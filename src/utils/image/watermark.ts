@@ -13,39 +13,65 @@ export const addWatermark = async (
   const size = img.width;
   const { canvas, ctx } = createCanvas(size, size);
   
-  // Set canvas background to be transparent
+  // Initialize canvas with transparency
   ctx.clearRect(0, 0, size, size);
   
-  // Enable global composite operations for proper transparency
+  // Draw the main image first
   ctx.globalCompositeOperation = 'source-over';
-  
-  // Draw the main image
   ctx.drawImage(img, 0, 0, size, size);
   
+  // Function to draw PNG image with proper transparency
+  const drawPNGWithTransparency = (
+    image: HTMLImageElement,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    alpha: number = 1
+  ) => {
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    const tempCtx = tempCanvas.getContext('2d')!;
+    
+    // Draw on temporary canvas
+    tempCtx.drawImage(image, 0, 0, width, height);
+    
+    // Set transparency and composite mode
+    ctx.globalAlpha = alpha;
+    ctx.globalCompositeOperation = 'source-over';
+    
+    // Draw from temp canvas to main canvas
+    ctx.drawImage(tempCanvas, x, y);
+    
+    // Reset alpha
+    ctx.globalAlpha = 1;
+  };
+
+  // Handle logo
   if (watermarkConfig.logo) {
     const logo = await loadImage(watermarkConfig.logo);
     const logoSize = size * 0.15;
-    ctx.save();
-    // Preserve transparency for PNG logos
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.globalAlpha = 1;
-    ctx.drawImage(logo, 20, 20, logoSize, logoSize);
-    ctx.restore();
+    drawPNGWithTransparency(logo, 20, 20, logoSize, logoSize);
   }
   
+  // Handle overlay
   if (watermarkConfig.overlay) {
     const overlay = await loadImage(watermarkConfig.overlay);
     const overlaySize = size * 0.3;
     const x = (watermarkConfig.position?.x ?? 50) * size / 100 - overlaySize / 2;
     const y = (watermarkConfig.position?.y ?? 50) * size / 100 - overlaySize / 2;
-    ctx.save();
-    // Preserve transparency for PNG overlays
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.globalAlpha = watermarkConfig.opacity ?? 0.5;
-    ctx.drawImage(overlay, x, y, overlaySize, overlaySize);
-    ctx.restore();
+    drawPNGWithTransparency(
+      overlay,
+      x,
+      y,
+      overlaySize,
+      overlaySize,
+      watermarkConfig.opacity ?? 0.5
+    );
   }
   
+  // Handle bottom images
   if (watermarkConfig.bottomImages?.length > 0) {
     const bottomHeight = size * 0.15;
     const bottomWidth = Math.min(size, size * 0.8);
@@ -57,15 +83,11 @@ export const addWatermark = async (
       const bottomImg = await loadImage(watermarkConfig.bottomImages[i]);
       const sectionWidth = (bottomWidth - (spacing * (maxImages - 1))) / maxImages;
       const x = (size - bottomWidth) / 2 + (i * (sectionWidth + spacing));
-      ctx.save();
-      // Preserve transparency for PNG bottom images
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.globalAlpha = 1;
-      ctx.drawImage(bottomImg, x, startY, sectionWidth, bottomHeight);
-      ctx.restore();
+      drawPNGWithTransparency(bottomImg, x, startY, sectionWidth, bottomHeight);
     }
   }
 
+  // Handle text overlay
   if (text) {
     const padding = size * 0.02;
     const fontSize = size * 0.03;
@@ -89,12 +111,9 @@ export const addWatermark = async (
 
   const imageHasTransparency = hasTransparency(ctx, size, size);
   
-  // Use PNG format if the image has transparency, otherwise use JPEG
-  const format = imageHasTransparency ? "image/png" : "image/jpeg";
-  const quality = format === "image/png" ? 1 : 0.95;
-  
+  // Always use PNG for output to preserve transparency
   return {
-    dataUrl: canvas.toDataURL(format, quality),
+    dataUrl: canvas.toDataURL('image/png', 1.0),
     hasTransparency: imageHasTransparency
   };
 };
