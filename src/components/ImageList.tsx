@@ -9,6 +9,10 @@ interface ImageListProps {
   selectedFont?: string;
   isProcessing: boolean;
   onProcess: (index: number) => void;
+  filterConfig: FilterConfig;
+  onFilterChange: (config: FilterConfig) => void;
+  onFormatChange: (format: string) => void;
+  onSizeChange: (size: number) => void;
 }
 
 export const ImageList = ({
@@ -18,6 +22,10 @@ export const ImageList = ({
   selectedFont,
   isProcessing,
   onProcess,
+  filterConfig,
+  onFilterChange,
+  onFormatChange,
+  onSizeChange,
 }: ImageListProps) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -33,9 +41,9 @@ export const ImageList = ({
           />
           <ImageControls
             format="image/jpeg"
-            onFormatChange={() => {}}
+            onFormatChange={onFormatChange}
             size={1080}
-            onSizeChange={() => {}}
+            onSizeChange={onSizeChange}
           />
         </div>
       ))}

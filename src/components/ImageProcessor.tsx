@@ -16,13 +16,15 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
   const [images, setImages] = useState<string[]>([]);
   const [processedImages, setProcessedImages] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [filterConfig] = useState<FilterConfig>({
+  const [filterConfig, setFilterConfig] = useState<FilterConfig>({
     brightness: 100,
     contrast: 100,
     saturation: 100,
     blur: 0,
     filter: "none",
   });
+  const [format, setFormat] = useState("image/jpeg");
+  const [size, setSize] = useState(1080);
 
   const handleImagesSelected = (newImages: File[]) => {
     const imageUrls = newImages.map(file => URL.createObjectURL(file));
@@ -45,7 +47,7 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
         img.src = image;
         await new Promise((resolve) => (img.onload = resolve));
 
-        let processedImage = await createSquareImage(img, 1080, filterConfig);
+        let processedImage = await createSquareImage(img, size, filterConfig);
 
         const watermarkConfig = localStorage.getItem("watermarkConfig");
         if (watermarkConfig) {
@@ -97,6 +99,10 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
         selectedFont={selectedFont}
         isProcessing={isProcessing}
         onProcess={handleSingleImageProcess}
+        filterConfig={filterConfig}
+        onFilterChange={setFilterConfig}
+        onFormatChange={setFormat}
+        onSizeChange={setSize}
       />
 
       <ProcessingControls
