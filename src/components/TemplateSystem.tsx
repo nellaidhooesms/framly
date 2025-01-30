@@ -93,9 +93,25 @@ export const TemplateSystem = ({
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    input.onchange = (e) => {
-      if (e.target instanceof HTMLInputElement) {
-        importConfigurations(e as React.ChangeEvent<HTMLInputElement>);
+    input.onchange = (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      if (target.files && target.files.length > 0) {
+        importConfigurations({
+          target,
+          currentTarget: target,
+          nativeEvent: e,
+          preventDefault: () => e.preventDefault(),
+          stopPropagation: () => e.stopPropagation(),
+          isPropagationStopped: () => false,
+          isDefaultPrevented: () => false,
+          persist: () => {},
+          bubbles: e.bubbles,
+          cancelable: e.cancelable,
+          eventPhase: e.eventPhase,
+          isTrusted: e.isTrusted,
+          timeStamp: e.timeStamp,
+          type: e.type
+        });
       }
     };
     input.click();
