@@ -1,5 +1,5 @@
 import { Button } from "./ui/button";
-import { Play, Archive } from "lucide-react";
+import { Play, Archive, Download } from "lucide-react";
 
 interface ProcessingControlsProps {
   onProcessAll: () => void;
@@ -33,7 +33,7 @@ export const ProcessingControls = ({
           className="w-full"
         >
           <Archive className="mr-2 h-4 w-4" />
-          Download ZIP
+          Download All as ZIP
         </Button>
       )}
     </div>

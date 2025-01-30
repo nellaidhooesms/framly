@@ -1,6 +1,8 @@
 import { ImagePreview } from "./ImagePreview";
 import { ImageControls } from "./ImageControls";
 import { FilterConfig } from "./ImageFilters";
+import { Button } from "./ui/button";
+import { Download, Trash2 } from "lucide-react";
 
 interface ImageListProps {
   images: string[];
@@ -13,6 +15,9 @@ interface ImageListProps {
   onFilterChange: (config: FilterConfig) => void;
   onFormatChange: (format: string) => void;
   onSizeChange: (size: number) => void;
+  onRemove: (index: number) => void;
+  onDownloadSingle?: (index: number) => void;
+  processedImages?: string[];
 }
 
 export const ImageList = ({
@@ -26,19 +31,44 @@ export const ImageList = ({
   onFilterChange,
   onFormatChange,
   onSizeChange,
+  onRemove,
+  onDownloadSingle,
+  processedImages = [],
 }: ImageListProps) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       {images.map((image, index) => (
         <div key={index} className="space-y-2">
-          <ImagePreview
-            src={image}
-            onProcess={() => onProcess(index)}
-            isProcessing={isProcessing}
-            text={text}
-            textDirection={textDirection}
-            selectedFont={selectedFont}
-          />
+          <div className="relative">
+            <ImagePreview
+              src={image}
+              onProcess={() => onProcess(index)}
+              isProcessing={isProcessing}
+              text={text}
+              textDirection={textDirection}
+              selectedFont={selectedFont}
+            />
+            <div className="absolute top-2 right-2 flex gap-2">
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => onRemove(index)}
+                className="rounded-full"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+              {processedImages[index] && onDownloadSingle && (
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  onClick={() => onDownloadSingle(index)}
+                  className="rounded-full"
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
           <ImageControls
             format="image/jpeg"
             onFormatChange={onFormatChange}

@@ -67,7 +67,7 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
     }
   };
 
-  const handleDownload = async () => {
+  const handleDownloadAll = async () => {
     if (processedImages.length === 0) {
       toast.error("No processed images to download");
       return;
@@ -82,9 +82,33 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
     }
   };
 
+  const handleDownloadSingle = async (index: number) => {
+    if (!processedImages[index]) {
+      toast.error("Image not processed yet");
+      return;
+    }
+
+    try {
+      const link = document.createElement('a');
+      link.href = processedImages[index];
+      link.download = `processed-image-${index + 1}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success("Image downloaded successfully!");
+    } catch (error) {
+      console.error("Error downloading image:", error);
+      toast.error("Error downloading image");
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImages(prevImages => prevImages.filter((_, i) => i !== index));
+    setProcessedImages(prevProcessed => prevProcessed.filter((_, i) => i !== index));
+    toast.success("Image removed successfully");
+  };
+
   const handleSingleImageProcess = (index: number) => {
-    // For now, process all images - in a future iteration this could be optimized
-    // to process only the selected image
     handleProcess();
   };
 
@@ -103,11 +127,14 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
         onFilterChange={setFilterConfig}
         onFormatChange={setFormat}
         onSizeChange={setSize}
+        onRemove={handleRemoveImage}
+        onDownloadSingle={handleDownloadSingle}
+        processedImages={processedImages}
       />
 
       <ProcessingControls
         onProcessAll={handleProcess}
-        onDownloadAll={handleDownload}
+        onDownloadAll={handleDownloadAll}
         hasImages={images.length > 0}
         hasProcessedImages={processedImages.length > 0}
         isProcessing={isProcessing}
