@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ImageUploader } from "./ImageUploader";
-import { ImagePreview } from "./ImagePreview";
-import { ImageControls } from "./ImageControls";
+import { ImageList } from "./ImageList";
 import { ProcessingControls } from "./ProcessingControls";
 import { FilterConfig } from "./ImageFilters";
 import { createSquareImage, addWatermark, downloadAsZip } from "../utils/imageProcessing";
@@ -17,7 +16,7 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
   const [images, setImages] = useState<string[]>([]);
   const [processedImages, setProcessedImages] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [filterConfig, setFilterConfig] = useState<FilterConfig>({
+  const [filterConfig] = useState<FilterConfig>({
     brightness: 100,
     contrast: 100,
     saturation: 100,
@@ -28,11 +27,6 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
   const handleImagesSelected = (newImages: File[]) => {
     const imageUrls = newImages.map(file => URL.createObjectURL(file));
     setImages((prevImages) => [...prevImages, ...imageUrls]);
-    setProcessedImages([]);
-  };
-
-  const handleImageRemove = (index: number) => {
-    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
     setProcessedImages([]);
   };
 
@@ -86,28 +80,24 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
     }
   };
 
+  const handleSingleImageProcess = (index: number) => {
+    // For now, process all images - in a future iteration this could be optimized
+    // to process only the selected image
+    handleProcess();
+  };
+
   return (
     <div className="space-y-6">
       <ImageUploader onImagesSelected={handleImagesSelected} />
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {images.map((image, index) => (
-          <div key={index} className="space-y-2">
-            <ImagePreview
-              src={image}
-              text={text}
-              textDirection={textDirection}
-              selectedFont={selectedFont}
-            />
-            <ImageControls
-              format="image/jpeg"
-              onFormatChange={() => {}}
-              size={1080}
-              onSizeChange={() => {}}
-            />
-          </div>
-        ))}
-      </div>
+      
+      <ImageList
+        images={images}
+        text={text}
+        textDirection={textDirection}
+        selectedFont={selectedFont}
+        isProcessing={isProcessing}
+        onProcess={handleSingleImageProcess}
+      />
 
       <ProcessingControls
         onProcessAll={handleProcess}
