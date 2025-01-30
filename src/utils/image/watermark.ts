@@ -1,10 +1,9 @@
 import { WatermarkConfig } from "../../components/WatermarkLayout";
 import { ProcessedImage } from "./types";
 import { createCanvas, hasTransparency } from "./canvas";
-import { addLogo } from "./watermarkLogo";
 import { addOverlay } from "./watermarkOverlay";
-import { addBottomImages } from "./watermarkBottomImages";
 import { addText } from "./watermarkText";
+import { createFrame } from "./frame";
 
 export const addWatermark = async (
   image: string,
@@ -20,17 +19,28 @@ export const addWatermark = async (
   const size = img.width;
   const { canvas, ctx } = createCanvas(size, size);
   
-  // Clear canvas and set it to be transparent
-  ctx.clearRect(0, 0, size, size);
-  
   // Draw base image
   ctx.drawImage(img, 0, 0, size, size);
   
-  // Add watermark elements
-  if (watermarkConfig.logo) {
-    await addLogo(ctx, watermarkConfig.logo, size);
+  // Create and add frame (logo + bottom images)
+  if (watermarkConfig.logo || watermarkConfig.bottomImages?.length > 0) {
+    const frame = await createFrame(
+      watermarkConfig.logo,
+      watermarkConfig.bottomImages || []
+    );
+    
+    const frameImg = new Image();
+    await new Promise((resolve) => {
+      frameImg.onload = resolve;
+      frameImg.src = frame;
+    });
+    
+    // Use source-over to preserve transparency
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(frameImg, 0, 0, size, size);
   }
   
+  // Add overlay if present
   if (watermarkConfig.overlay) {
     await addOverlay(
       ctx,
@@ -41,10 +51,7 @@ export const addWatermark = async (
     );
   }
   
-  if (watermarkConfig.bottomImages?.length > 0) {
-    await addBottomImages(ctx, watermarkConfig.bottomImages, size);
-  }
-  
+  // Add text if present
   if (text) {
     addText(ctx, text, size, textDirection, selectedFont);
   }
