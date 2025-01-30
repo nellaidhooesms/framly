@@ -13,15 +13,21 @@ export const addWatermark = async (
   const size = img.width;
   const { canvas, ctx } = createCanvas(size, size);
   
+  // Clear canvas with transparent background
   ctx.clearRect(0, 0, size, size);
-  const bottomHeight = size * 0.15;
   
+  // Draw the main image
   ctx.drawImage(img, 0, 0, size, size);
   
   if (watermarkConfig.logo) {
     const logo = await loadImage(watermarkConfig.logo);
     const logoSize = size * 0.15;
+    // Save context state before applying alpha
+    ctx.save();
+    ctx.globalAlpha = 1;
     ctx.drawImage(logo, 20, 20, logoSize, logoSize);
+    // Restore context state
+    ctx.restore();
   }
   
   if (watermarkConfig.overlay) {
@@ -29,12 +35,16 @@ export const addWatermark = async (
     const overlaySize = size * 0.3;
     const x = (watermarkConfig.position?.x ?? 50) * size / 100 - overlaySize / 2;
     const y = (watermarkConfig.position?.y ?? 50) * size / 100 - overlaySize / 2;
+    // Save context state before applying alpha
+    ctx.save();
     ctx.globalAlpha = watermarkConfig.opacity ?? 0.5;
     ctx.drawImage(overlay, x, y, overlaySize, overlaySize);
-    ctx.globalAlpha = 1;
+    // Restore context state
+    ctx.restore();
   }
   
   if (watermarkConfig.bottomImages?.length > 0) {
+    const bottomHeight = size * 0.15;
     const bottomWidth = Math.min(size, size * 0.8);
     const maxImages = Math.min(3, watermarkConfig.bottomImages.length);
     const spacing = size * 0.02;
@@ -44,13 +54,22 @@ export const addWatermark = async (
       const bottomImg = await loadImage(watermarkConfig.bottomImages[i]);
       const sectionWidth = (bottomWidth - (spacing * (maxImages - 1))) / maxImages;
       const x = (size - bottomWidth) / 2 + (i * (sectionWidth + spacing));
+      // Save context state before drawing each bottom image
+      ctx.save();
+      ctx.globalAlpha = 1;
       ctx.drawImage(bottomImg, x, startY, sectionWidth, bottomHeight);
+      // Restore context state
+      ctx.restore();
     }
   }
 
   if (text) {
     const padding = size * 0.02;
     const fontSize = size * 0.03;
+    const bottomHeight = size * 0.15;
+    
+    // Save context state before drawing text background
+    ctx.save();
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
     ctx.fillRect(0, size - bottomHeight - padding * 2, size, bottomHeight);
     
@@ -62,6 +81,8 @@ export const addWatermark = async (
     const textX = textDirection === 'rtl' ? size - padding : padding;
     const textY = size - bottomHeight - padding / 2;
     ctx.fillText(text, textX, textY);
+    // Restore context state
+    ctx.restore();
   }
 
   const imageHasTransparency = hasTransparency(ctx, size, size);
