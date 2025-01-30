@@ -134,33 +134,6 @@ export const addWatermark = async (
       ctx.drawImage(bottomImg, x, startY, sectionWidth, bottomHeight);
     }
   }
-
-  // Add text overlay with custom font
-  if (watermarkConfig.textConfig.text) {
-    const fontSize = size * 0.03;
-    const font = watermarkConfig.textConfig.font || 'Arial';
-    ctx.font = `bold ${fontSize}px ${font}`;
-    ctx.fillStyle = "white";
-    ctx.textAlign = watermarkConfig.textConfig.direction === "rtl" ? "right" : "left";
-    ctx.textBaseline = "middle";
-    
-    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-    ctx.shadowBlur = 4;
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
-
-    const x = watermarkConfig.textConfig.direction === "rtl"
-      ? size - 40
-      : 40;
-    const y = size - (size * 0.05);
-
-    ctx.fillText(watermarkConfig.textConfig.text, x, y);
-
-    ctx.shadowColor = "transparent";
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-  }
   
   const quality = outputFormat === 'image/jpeg' ? 0.95 : undefined;
   return canvas.toDataURL(outputFormat, quality);
