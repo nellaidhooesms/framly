@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { ImagePreview } from "./ImagePreview";
 import { ImageControls } from "./ImageControls";
 import { FilterConfig } from "./ImageFilters";
@@ -20,7 +21,7 @@ interface ImageListProps {
   processedImages?: string[];
 }
 
-export const ImageList = ({
+export const ImageList = memo(({
   images,
   text,
   textDirection,
@@ -36,10 +37,10 @@ export const ImageList = ({
   processedImages = [],
 }: ImageListProps) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {images.map((image, index) => (
-        <div key={index} className="space-y-2">
-          <div className="relative">
+        <div key={index} className="space-y-2 animate-fade-up">
+          <div className="relative group">
             <ImagePreview
               src={image}
               onProcess={() => onProcess(index)}
@@ -48,7 +49,7 @@ export const ImageList = ({
               textDirection={textDirection}
               selectedFont={selectedFont}
             />
-            <div className="absolute top-2 right-2 flex gap-2">
+            <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <Button
                 variant="destructive"
                 size="icon"
@@ -79,4 +80,6 @@ export const ImageList = ({
       ))}
     </div>
   );
-};
+});
+
+ImageList.displayName = "ImageList";

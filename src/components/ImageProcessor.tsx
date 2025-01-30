@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { ImageUploader } from "./ImageUploader";
 import { ImageList } from "./ImageList";
 import { ProcessingControls } from "./ProcessingControls";
@@ -43,10 +43,32 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
     }
   });
 
-  const handleImagesSelected = (newImages: File[]) => {
+  const handleImagesSelected = useCallback((newImages: File[]) => {
     const imageUrls = newImages.map(file => URL.createObjectURL(file));
-    setImages((prevImages) => [...prevImages, ...imageUrls]);
+    setImages(prev => [...prev, ...imageUrls]);
     setProcessedImages([]);
+  }, []);
+
+  const processImage = async (image: string) => {
+    const img = new Image();
+    img.src = image;
+    await new Promise((resolve) => (img.onload = resolve));
+
+    const squareResult = await createSquareImage(img, size, filterConfig);
+
+    const watermarkConfig = selectedTemplate !== "default"
+      ? templates[selectedTemplate]
+      : JSON.parse(localStorage.getItem("watermarkConfig") || "{}");
+
+    const watermarkResult = await addWatermark(
+      squareResult.dataUrl,
+      watermarkConfig,
+      text,
+      textDirection,
+      selectedFont
+    );
+
+    return watermarkResult.dataUrl;
   };
 
   const handleProcess = async () => {
@@ -61,31 +83,9 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
     }
 
     setIsProcessing(true);
-    const processed: string[] = [];
 
     try {
-      for (const image of images) {
-        const img = new Image();
-        img.src = image;
-        await new Promise((resolve) => (img.onload = resolve));
-
-        const squareResult = await createSquareImage(img, size, filterConfig);
-
-        // Use selected template if available, otherwise fall back to saved config
-        const watermarkConfig = selectedTemplate !== "default"
-          ? templates[selectedTemplate]
-          : JSON.parse(localStorage.getItem("watermarkConfig") || "{}");
-
-        const watermarkResult = await addWatermark(
-          squareResult.dataUrl,
-          watermarkConfig,
-          text,
-          textDirection,
-          selectedFont
-        );
-        processed.push(watermarkResult.dataUrl);
-      }
-
+      const processed = await Promise.all(images.map(processImage));
       setProcessedImages(processed);
       toast.success("Images processed successfully!");
     } catch (error) {
@@ -96,7 +96,7 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
     }
   };
 
-  const handleDownloadAll = async () => {
+  const handleDownloadAll = useCallback(async () => {
     if (processedImages.length === 0) {
       toast.error("No processed images to download");
       return;
@@ -109,9 +109,9 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
       console.error("Error downloading images:", error);
       toast.error("Error downloading images");
     }
-  };
+  }, [processedImages]);
 
-  const handleDownloadSingle = async (index: number) => {
+  const handleDownloadSingle = useCallback(async (index: number) => {
     if (!processedImages[index]) {
       toast.error("Image not processed yet");
       return;
@@ -129,17 +129,13 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
       console.error("Error downloading image:", error);
       toast.error("Error downloading image");
     }
-  };
+  }, [processedImages]);
 
-  const handleRemoveImage = (index: number) => {
-    setImages(prevImages => prevImages.filter((_, i) => i !== index));
-    setProcessedImages(prevProcessed => prevProcessed.filter((_, i) => i !== index));
+  const handleRemoveImage = useCallback((index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+    setProcessedImages(prev => prev.filter((_, i) => i !== index));
     toast.success("Image removed successfully");
-  };
-
-  const handleSingleImageProcess = (index: number) => {
-    handleProcess();
-  };
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -175,7 +171,7 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
         textDirection={textDirection}
         selectedFont={selectedFont}
         isProcessing={isProcessing}
-        onProcess={handleSingleImageProcess}
+        onProcess={handleProcess}
         filterConfig={filterConfig}
         onFilterChange={setFilterConfig}
         onFormatChange={setFormat}
