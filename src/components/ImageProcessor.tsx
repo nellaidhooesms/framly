@@ -25,8 +25,9 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
     filter: "none",
   });
 
-  const handleImagesUpload = (newImages: string[]) => {
-    setImages((prevImages) => [...prevImages, ...newImages]);
+  const handleImagesSelected = (newImages: File[]) => {
+    const imageUrls = newImages.map(file => URL.createObjectURL(file));
+    setImages((prevImages) => [...prevImages, ...imageUrls]);
     setProcessedImages([]);
   };
 
@@ -87,34 +88,34 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
 
   return (
     <div className="space-y-6">
-      <ImageUploader onImagesUpload={handleImagesUpload} />
+      <ImageUploader onImagesSelected={handleImagesSelected} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {images.map((image, index) => (
           <div key={index} className="space-y-2">
             <ImagePreview
               src={image}
-              onProcess={handleProcess}
-              isProcessing={isProcessing}
               text={text}
               textDirection={textDirection}
               selectedFont={selectedFont}
             />
             <ImageControls
-              onRemove={() => handleImageRemove(index)}
-              filterConfig={filterConfig}
-              onFilterChange={setFilterConfig}
+              format="image/jpeg"
+              onFormatChange={() => {}}
+              size={1080}
+              onSizeChange={() => {}}
             />
           </div>
         ))}
       </div>
 
-      {processedImages.length > 0 && (
-        <ProcessingControls
-          processedImages={processedImages}
-          onDownload={handleDownload}
-        />
-      )}
+      <ProcessingControls
+        onProcessAll={handleProcess}
+        onDownloadAll={handleDownload}
+        hasImages={images.length > 0}
+        hasProcessedImages={processedImages.length > 0}
+        isProcessing={isProcessing}
+      />
     </div>
   );
 };
