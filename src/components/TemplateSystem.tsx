@@ -21,9 +21,68 @@ export const TemplateSystem = ({
   React.useEffect(() => {
     const savedTemplates = localStorage.getItem("watermarkTemplates");
     if (savedTemplates) {
-      setTemplates(JSON.parse(savedTemplates));
+      try {
+        setTemplates(JSON.parse(savedTemplates));
+      } catch (error) {
+        console.error("Error loading templates:", error);
+        toast.error("Failed to load saved templates");
+      }
     }
   }, []);
+
+  const compressImages = (config: WatermarkConfig): WatermarkConfig => {
+    const compressImage = (base64: string | undefined): string | undefined => {
+      if (!base64) return undefined;
+      
+      const canvas = document.createElement('canvas');
+      const img = new Image();
+      img.src = base64;
+      
+      // Set maximum dimensions
+      const maxWidth = 800;
+      const maxHeight = 800;
+      let width = img.width;
+      let height = img.height;
+      
+      if (width > height) {
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width = Math.round((width * maxHeight) / height);
+          height = maxHeight;
+        }
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      return canvas.toDataURL('image/jpeg', 0.7);
+    };
+
+    return {
+      ...config,
+      logo: compressImage(config.logo),
+      overlay: compressImage(config.overlay),
+      bottomImages: config.bottomImages.map(img => compressImage(img) || ''),
+    };
+  };
+
+  const cleanupOldTemplates = () => {
+    const templateEntries = Object.entries(templates);
+    if (templateEntries.length > 10) {
+      const reducedTemplates = Object.fromEntries(
+        templateEntries.slice(-10)
+      );
+      setTemplates(reducedTemplates);
+      localStorage.setItem("watermarkTemplates", JSON.stringify(reducedTemplates));
+    }
+  };
 
   const saveTemplate = () => {
     if (!newTemplateName) {
@@ -31,15 +90,49 @@ export const TemplateSystem = ({
       return;
     }
 
-    const updatedTemplates = {
-      ...templates,
-      [newTemplateName]: currentConfig,
-    };
+    try {
+      // Compress images before saving
+      const compressedConfig = compressImages(currentConfig);
+      
+      // Cleanup old templates if we have too many
+      cleanupOldTemplates();
 
-    setTemplates(updatedTemplates);
-    localStorage.setItem("watermarkTemplates", JSON.stringify(updatedTemplates));
-    setNewTemplateName("");
-    toast.success("Template saved successfully");
+      const updatedTemplates = {
+        ...templates,
+        [newTemplateName]: compressedConfig,
+      };
+
+      // Try to save to localStorage
+      try {
+        localStorage.setItem("watermarkTemplates", JSON.stringify(updatedTemplates));
+        setTemplates(updatedTemplates);
+        setNewTemplateName("");
+        toast.success("Template saved successfully");
+      } catch (storageError) {
+        // If storage fails, try to remove the oldest template
+        const templateKeys = Object.keys(templates);
+        if (templateKeys.length > 0) {
+          const oldestTemplate = templateKeys[0];
+          const reducedTemplates = { ...templates };
+          delete reducedTemplates[oldestTemplate];
+          
+          const finalTemplates = {
+            ...reducedTemplates,
+            [newTemplateName]: compressedConfig,
+          };
+          
+          localStorage.setItem("watermarkTemplates", JSON.stringify(finalTemplates));
+          setTemplates(finalTemplates);
+          setNewTemplateName("");
+          toast.success("Template saved successfully (removed oldest template)");
+        } else {
+          throw new Error("Cannot save template: storage full");
+        }
+      }
+    } catch (error) {
+      console.error("Error saving template:", error);
+      toast.error("Failed to save template. Try using smaller images.");
+    }
   };
 
   const exportConfigurations = () => {
