@@ -25,10 +25,12 @@ export const FontSelector = ({
   onFontChange,
   onCustomFontUpload,
 }: FontSelectorProps) => {
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && (file.name.endsWith('.otf') || file.name.endsWith('.ttf'))) {
       onCustomFontUpload(file);
+    } else {
+      toast.error("Please upload a valid font file (.otf or .ttf)");
     }
   };
 
@@ -58,9 +60,10 @@ export const FontSelector = ({
         <Button
           variant="outline"
           onClick={() => document.getElementById('font-upload')?.click()}
+          className="w-full"
         >
           <Upload className="w-4 h-4 mr-2" />
-          Upload Custom Font
+          Upload Custom Font (Thaana Support)
         </Button>
       </div>
     </div>
