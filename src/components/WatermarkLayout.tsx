@@ -56,8 +56,16 @@ export const WatermarkLayout = ({ onSave }: WatermarkLayoutProps) => {
           }}
         />
 
-        <LogoUploader logo={logo} onLogoChange={setLogo} />
-        <OverlayUploader overlay={overlay} onOverlayChange={setOverlay} />
+        <LogoUploader 
+          logo={logo} 
+          onLogoChange={setLogo} 
+        />
+        
+        <OverlayUploader 
+          overlay={overlay} 
+          onOverlayChange={setOverlay}
+        />
+        
         <BottomImagesUploader
           bottomImages={bottomImages}
           onBottomImagesChange={setBottomImages}
@@ -71,7 +79,7 @@ export const WatermarkLayout = ({ onSave }: WatermarkLayoutProps) => {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Preview</h3>
         <WatermarkPreview
-          imageUrl={overlay || logo}
+          imageUrl={overlay}
           config={{
             logo,
             overlay,

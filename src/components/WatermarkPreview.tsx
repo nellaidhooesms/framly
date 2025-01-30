@@ -3,6 +3,7 @@ import { Skeleton } from "./ui/skeleton";
 import { WatermarkConfig } from "./WatermarkLayout";
 import { Slider } from "./ui/slider";
 import { Label } from "./ui/label";
+import { createFrame } from "../utils/image/frame";
 
 interface WatermarkPreviewProps {
   imageUrl?: string;
@@ -18,11 +19,22 @@ export const WatermarkPreview = ({
   onOpacityChange,
 }: WatermarkPreviewProps) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [frameUrl, setFrameUrl] = useState<string>();
   const [opacity, setOpacity] = useState(config.opacity ? config.opacity * 100 : 100);
   const [position, setPosition] = useState({
     x: config.position?.x || 50,
     y: config.position?.y || 50
   });
+
+  useEffect(() => {
+    const generateFrame = async () => {
+      if (config.logo || config.bottomImages.length > 0) {
+        const frame = await createFrame(config.logo, config.bottomImages);
+        setFrameUrl(frame);
+      }
+    };
+    generateFrame();
+  }, [config.logo, config.bottomImages]);
 
   useEffect(() => {
     if (config.position) {
@@ -64,7 +76,7 @@ export const WatermarkPreview = ({
     <div className="space-y-4">
       <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-secondary">
         {isLoading && <Skeleton className="w-full h-full absolute inset-0" />}
-        {imageUrl ? (
+        {imageUrl && (
           <img
             src={imageUrl}
             alt="Preview"
@@ -72,7 +84,16 @@ export const WatermarkPreview = ({
             style={getImageStyle()}
             onLoad={handleImageLoad}
           />
-        ) : (
+        )}
+        {frameUrl && (
+          <img
+            src={frameUrl}
+            alt="Frame"
+            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+            style={{ opacity: opacity / 100 }}
+          />
+        )}
+        {!imageUrl && !frameUrl && (
           <div className="flex items-center justify-center h-full text-muted-foreground">
             No image selected
           </div>
