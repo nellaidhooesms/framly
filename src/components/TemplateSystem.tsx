@@ -93,7 +93,11 @@ export const TemplateSystem = ({
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    input.onchange = (e) => importConfigurations(e as React.ChangeEvent<HTMLInputElement>);
+    input.onchange = (e) => {
+      if (e.target instanceof HTMLInputElement) {
+        importConfigurations(e as React.ChangeEvent<HTMLInputElement>);
+      }
+    };
     input.click();
   };
 
