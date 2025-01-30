@@ -8,9 +8,13 @@ export const createSquareImage = async (
   filterConfig?: FilterConfig
 ): Promise<string> => {
   const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d")!;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
   canvas.width = size;
   canvas.height = size;
+
+  // Set white background for JPEGs, transparent for PNGs
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, size, size);
 
   // If image is portrait, add blurred background
   if (originalImage.height > originalImage.width) {
@@ -75,7 +79,12 @@ export const createSquareImage = async (
     ctx.drawImage(tempCanvas, 0, 0);
   }
 
-  return canvas.toDataURL("image/jpeg", 0.95);
+  // Determine if the image has any transparency
+  const imageData = ctx.getImageData(0, 0, size, size);
+  const hasTransparency = Array.from(imageData.data).some((value, index) => (index + 1) % 4 === 0 && value < 255);
+
+  // Use PNG for images with transparency, JPEG for others
+  return canvas.toDataURL(hasTransparency ? "image/png" : "image/jpeg", 0.95);
 };
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {
@@ -92,15 +101,18 @@ export const addWatermark = async (
   text?: string,
   textDirection?: "ltr" | "rtl",
   selectedFont?: string,
-  outputFormat: string = 'image/jpeg'
+  outputFormat: string = 'image/png'
 ): Promise<string> => {
   const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d")!;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
   const img = await loadImage(image);
   const size = img.width;
   
   canvas.width = size;
   canvas.height = size;
+  
+  // Clear canvas with transparency
+  ctx.clearRect(0, 0, size, size);
   
   // Define bottomHeight here so it's available throughout the function
   const bottomHeight = size * 0.15;
@@ -158,9 +170,13 @@ export const addWatermark = async (
     
     ctx.fillText(text, textX, textY);
   }
+
+  // Determine if the image has any transparency
+  const imageData = ctx.getImageData(0, 0, size, size);
+  const hasTransparency = Array.from(imageData.data).some((value, index) => (index + 1) % 4 === 0 && value < 255);
   
-  const quality = outputFormat === 'image/jpeg' ? 0.95 : undefined;
-  return canvas.toDataURL(outputFormat, quality);
+  // Use PNG for images with transparency, JPEG for others
+  return canvas.toDataURL(hasTransparency ? "image/png" : "image/jpeg", 0.95);
 };
 
 export const downloadAsZip = async (images: string[], filename: string = 'processed-images.zip') => {
@@ -173,7 +189,11 @@ export const downloadAsZip = async (images: string[], filename: string = 'proces
       array[i] = data.charCodeAt(i);
     }
     
-    zip.file(`image-${index + 1}.jpg`, array);
+    // Determine file extension based on data URL
+    const isJPEG = imageData.startsWith('data:image/jpeg');
+    const extension = isJPEG ? 'jpg' : 'png';
+    
+    zip.file(`image-${index + 1}.${extension}`, array);
   });
   
   const content = await zip.generateAsync({ type: 'blob' });
