@@ -23,13 +23,22 @@ export const TextConfiguration = ({
   onCustomFontUpload,
 }: TextConfigurationProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4 bg-secondary rounded-lg">
       <h3 className="text-lg font-semibold">Text Configuration</h3>
-      <Input
-        placeholder="Enter image description"
-        value={text}
-        onChange={(e) => onTextChange(e.target.value)}
-      />
+      <div className="space-y-2">
+        <Label htmlFor="text-input">Image Description</Label>
+        <Input
+          id="text-input"
+          placeholder="Enter image description"
+          value={text}
+          onChange={(e) => onTextChange(e.target.value)}
+          style={{ 
+            fontFamily: selectedFont,
+            direction: textDirection,
+            textAlign: textDirection === 'rtl' ? 'right' : 'left'
+          }}
+        />
+      </div>
 
       <FontSelector
         selectedFont={selectedFont}
@@ -38,7 +47,7 @@ export const TextConfiguration = ({
       />
 
       <div className="space-y-2">
-        <h4 className="text-sm font-medium">Text Direction</h4>
+        <Label>Text Direction</Label>
         <RadioGroup
           value={textDirection}
           onValueChange={onDirectionChange}

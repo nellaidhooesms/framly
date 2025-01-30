@@ -65,6 +65,17 @@ const Index = () => {
               onFontChange={setSelectedFont}
               onCustomFontUpload={handleCustomFontUpload}
             />
+            <div 
+              className="p-4 bg-secondary rounded-lg"
+              style={{ 
+                fontFamily: selectedFont,
+                direction: textDirection,
+                textAlign: textDirection === 'rtl' ? 'right' : 'left'
+              }}
+            >
+              <h3 className="text-lg font-semibold mb-2">Preview</h3>
+              <p className="break-words">{text || "Enter text to preview"}</p>
+            </div>
           </div>
           
           <div>
