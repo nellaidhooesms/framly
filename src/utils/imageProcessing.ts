@@ -102,6 +102,9 @@ export const addWatermark = async (
   canvas.width = size;
   canvas.height = size;
   
+  // Define bottomHeight here so it's available throughout the function
+  const bottomHeight = size * 0.15;
+  
   // Draw original image
   ctx.drawImage(img, 0, 0, size, size);
   
@@ -125,7 +128,6 @@ export const addWatermark = async (
   
   // Add bottom images if provided
   if (watermarkConfig.bottomImages && watermarkConfig.bottomImages.length > 0) {
-    const bottomHeight = size * 0.15;
     const bottomWidth = Math.min(size, size * 0.8);
     const maxImages = Math.min(3, watermarkConfig.bottomImages.length);
     const spacing = size * 0.02;
