@@ -18,7 +18,7 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
   const [images, setImages] = useState<string[]>([]);
   const [processedImages, setProcessedImages] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("default");
   const [templates, setTemplates] = useState<Record<string, WatermarkConfig>>({});
   const [filterConfig, setFilterConfig] = useState<FilterConfig>({
     brightness: 100,
@@ -55,7 +55,7 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
       return;
     }
 
-    if (!selectedTemplate && !localStorage.getItem("watermarkConfig")) {
+    if (selectedTemplate === "default" && !localStorage.getItem("watermarkConfig")) {
       toast.error("Please select a template or configure watermark settings");
       return;
     }
@@ -72,7 +72,7 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
         let processedImage = await createSquareImage(img, size, filterConfig);
 
         // Use selected template if available, otherwise fall back to saved config
-        const watermarkConfig = selectedTemplate 
+        const watermarkConfig = selectedTemplate !== "default"
           ? templates[selectedTemplate]
           : JSON.parse(localStorage.getItem("watermarkConfig") || "{}");
 
@@ -152,7 +152,7 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
               <SelectValue placeholder="Choose a template" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Default Configuration</SelectItem>
+              <SelectItem value="default">Default Configuration</SelectItem>
               {Object.keys(templates).map((templateName) => (
                 <SelectItem key={templateName} value={templateName}>
                   {templateName}
