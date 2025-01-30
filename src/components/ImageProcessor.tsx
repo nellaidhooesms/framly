@@ -76,7 +76,13 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
           ? templates[selectedTemplate]
           : JSON.parse(localStorage.getItem("watermarkConfig") || "{}");
 
-        processedImage = await addWatermark(processedImage, watermarkConfig);
+        processedImage = await addWatermark(
+          processedImage, 
+          watermarkConfig,
+          text,
+          textDirection,
+          selectedFont
+        );
         processed.push(processedImage);
       }
 

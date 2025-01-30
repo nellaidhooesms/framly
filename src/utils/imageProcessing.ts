@@ -89,6 +89,9 @@ const loadImage = (src: string): Promise<HTMLImageElement> => {
 export const addWatermark = async (
   image: string,
   watermarkConfig: WatermarkConfig,
+  text?: string,
+  textDirection?: "ltr" | "rtl",
+  selectedFont?: string,
   outputFormat: string = 'image/jpeg'
 ): Promise<string> => {
   const canvas = document.createElement("canvas");
@@ -113,14 +116,15 @@ export const addWatermark = async (
   if (watermarkConfig.overlay) {
     const overlay = await loadImage(watermarkConfig.overlay);
     const overlaySize = size * 0.3;
-    const x = size - overlaySize - 20;
+    const x = (watermarkConfig.position?.x ?? 50) * size / 100 - overlaySize / 2;
+    const y = (watermarkConfig.position?.y ?? 50) * size / 100 - overlaySize / 2;
     ctx.globalAlpha = watermarkConfig.opacity ?? 0.5;
-    ctx.drawImage(overlay, x, 20, overlaySize, overlaySize);
+    ctx.drawImage(overlay, x, y, overlaySize, overlaySize);
     ctx.globalAlpha = 1;
   }
   
   // Add bottom images if provided
-  if (watermarkConfig.bottomImages.length > 0) {
+  if (watermarkConfig.bottomImages && watermarkConfig.bottomImages.length > 0) {
     const bottomHeight = size * 0.15;
     const bottomWidth = Math.min(size, size * 0.8);
     const maxImages = Math.min(3, watermarkConfig.bottomImages.length);
@@ -133,6 +137,24 @@ export const addWatermark = async (
       const x = (size - bottomWidth) / 2 + (i * (sectionWidth + spacing));
       ctx.drawImage(bottomImg, x, startY, sectionWidth, bottomHeight);
     }
+  }
+
+  // Add text description if provided
+  if (text) {
+    const padding = size * 0.02;
+    const fontSize = size * 0.03;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillRect(0, size - bottomHeight - padding * 2, size, bottomHeight);
+    
+    ctx.font = `${fontSize}px ${selectedFont || 'Arial'}`;
+    ctx.fillStyle = 'white';
+    ctx.textAlign = textDirection === 'rtl' ? 'right' : 'left';
+    ctx.direction = textDirection || 'ltr';
+    
+    const textX = textDirection === 'rtl' ? size - padding : padding;
+    const textY = size - bottomHeight - padding / 2;
+    
+    ctx.fillText(text, textX, textY);
   }
   
   const quality = outputFormat === 'image/jpeg' ? 0.95 : undefined;
