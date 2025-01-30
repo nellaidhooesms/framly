@@ -5,6 +5,8 @@ import { ProcessingControls } from "./ProcessingControls";
 import { FilterConfig } from "./ImageFilters";
 import { createSquareImage, addWatermark, downloadAsZip } from "../utils/imageProcessing";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { WatermarkConfig } from "./WatermarkLayout";
 
 interface ImageProcessorProps {
   text?: string;
@@ -16,6 +18,8 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
   const [images, setImages] = useState<string[]>([]);
   const [processedImages, setProcessedImages] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [templates, setTemplates] = useState<Record<string, WatermarkConfig>>({});
   const [filterConfig, setFilterConfig] = useState<FilterConfig>({
     brightness: 100,
     contrast: 100,
@@ -26,6 +30,19 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
   const [format, setFormat] = useState("image/jpeg");
   const [size, setSize] = useState(1080);
 
+  // Load templates on component mount
+  useState(() => {
+    const savedTemplates = localStorage.getItem("watermarkTemplates");
+    if (savedTemplates) {
+      try {
+        setTemplates(JSON.parse(savedTemplates));
+      } catch (error) {
+        console.error("Error loading templates:", error);
+        toast.error("Failed to load saved templates");
+      }
+    }
+  });
+
   const handleImagesSelected = (newImages: File[]) => {
     const imageUrls = newImages.map(file => URL.createObjectURL(file));
     setImages((prevImages) => [...prevImages, ...imageUrls]);
@@ -35,6 +52,11 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
   const handleProcess = async () => {
     if (images.length === 0) {
       toast.error("Please upload at least one image");
+      return;
+    }
+
+    if (!selectedTemplate && !localStorage.getItem("watermarkConfig")) {
+      toast.error("Please select a template or configure watermark settings");
       return;
     }
 
@@ -49,11 +71,12 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
 
         let processedImage = await createSquareImage(img, size, filterConfig);
 
-        const watermarkConfig = localStorage.getItem("watermarkConfig");
-        if (watermarkConfig) {
-          processedImage = await addWatermark(processedImage, JSON.parse(watermarkConfig));
-        }
+        // Use selected template if available, otherwise fall back to saved config
+        const watermarkConfig = selectedTemplate 
+          ? templates[selectedTemplate]
+          : JSON.parse(localStorage.getItem("watermarkConfig") || "{}");
 
+        processedImage = await addWatermark(processedImage, watermarkConfig);
         processed.push(processedImage);
       }
 
@@ -114,7 +137,31 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
 
   return (
     <div className="space-y-6">
-      <ImageUploader onImagesSelected={handleImagesSelected} />
+      <div className="space-y-4">
+        <ImageUploader onImagesSelected={handleImagesSelected} />
+        
+        <div className="flex flex-col space-y-2">
+          <label htmlFor="template-select" className="text-sm font-medium">
+            Select Template (Optional)
+          </label>
+          <Select
+            value={selectedTemplate}
+            onValueChange={setSelectedTemplate}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Choose a template" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Default Configuration</SelectItem>
+              {Object.keys(templates).map((templateName) => (
+                <SelectItem key={templateName} value={templateName}>
+                  {templateName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
       
       <ImageList
         images={images}
