@@ -29,38 +29,40 @@ export const createFrame = async (
     ctx.drawImage(logoImg, padding, padding, logoWidth, logoHeight);
   }
 
-  // Add bottom images if provided
+  // Add bottom image if provided
   if (bottomImages.length > 0) {
-    const bottomHeight = size * 0.15; // 15% of frame size
-    const bottomWidth = size * 0.8; // 80% of frame width
-    const maxImages = Math.min(3, bottomImages.length);
-    const spacing = size * 0.02; // 2% spacing
-    const startY = size - bottomHeight - spacing;
-    const startX = (size - bottomWidth) / 2;
+    const bottomHeight = 50; // Fixed 50px height
+    const bottomWidth = size; // Full width (1080px)
+    const startY = size - bottomHeight;
 
-    await Promise.all(bottomImages.map(async (imgSrc, index) => {
-      if (index >= maxImages) return;
+    const img = await new Promise<HTMLImageElement>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.src = bottomImages[0]; // Only use the first image
+    });
 
-      const img = await new Promise<HTMLImageElement>((resolve) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.src = imgSrc;
-      });
+    // Preserve aspect ratio while fitting within the specified dimensions
+    const imgAspectRatio = img.width / img.height;
+    const targetAspectRatio = bottomWidth / bottomHeight;
 
-      const sectionWidth = (bottomWidth - (spacing * (maxImages - 1))) / maxImages;
-      const x = startX + (index * (sectionWidth + spacing));
-      
-      // Preserve aspect ratio for bottom images
-      const imgAspectRatio = img.width / img.height;
-      const imgWidth = sectionWidth;
-      const imgHeight = bottomHeight;
-      const drawWidth = Math.min(imgWidth, imgHeight * imgAspectRatio);
-      const drawHeight = Math.min(imgHeight, imgWidth / imgAspectRatio);
-      const xOffset = (sectionWidth - drawWidth) / 2;
-      const yOffset = (bottomHeight - drawHeight) / 2;
-      
-      ctx.drawImage(img, x + xOffset, startY + yOffset, drawWidth, drawHeight);
-    }));
+    let drawWidth = bottomWidth;
+    let drawHeight = bottomHeight;
+    let x = 0;
+    let y = startY;
+
+    if (imgAspectRatio > targetAspectRatio) {
+      // Image is wider than the target area
+      drawHeight = bottomHeight;
+      drawWidth = drawHeight * imgAspectRatio;
+      x = (bottomWidth - drawWidth) / 2;
+    } else {
+      // Image is taller than the target area
+      drawWidth = bottomWidth;
+      drawHeight = drawWidth / imgAspectRatio;
+      y = startY + (bottomHeight - drawHeight) / 2;
+    }
+
+    ctx.drawImage(img, x, y, drawWidth, drawHeight);
   }
 
   return canvas.toDataURL('image/png', 1.0);

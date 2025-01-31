@@ -14,15 +14,15 @@ export const BottomImagesUploader = ({
   onBottomImagesChange,
   description,
 }: BottomImagesUploaderProps) => {
-  const handleRemoveImage = (index: number) => {
-    onBottomImagesChange(bottomImages.filter((_, i) => i !== index));
+  const handleRemoveImage = () => {
+    onBottomImagesChange([]);
     toast.success("Image removed successfully");
   };
 
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <h3 className="text-lg font-semibold">Bottom Images</h3>
+        <h3 className="text-lg font-semibold">Bottom Image</h3>
         {description && (
           <p className="text-sm text-muted-foreground">{description}</p>
         )}
@@ -38,26 +38,25 @@ export const BottomImagesUploader = ({
           });
 
           Promise.all(promises).then((images) => {
-            const newImages = [...bottomImages, ...images].slice(0, 3);
-            onBottomImagesChange(newImages);
-            toast.success(`${Math.min(files.length, 3 - bottomImages.length)} bottom images uploaded`);
+            onBottomImagesChange([images[0]]);
+            toast.success("Bottom image uploaded");
           });
         }}
-        maxFiles={Math.max(0, 3 - bottomImages.length)}
+        maxFiles={1}
       />
       <div className="flex gap-4 flex-wrap">
         {bottomImages.map((image, index) => (
           <div key={index} className="relative group">
             <img
               src={image}
-              alt={`Bottom ${index + 1}`}
+              alt="Bottom"
               className="w-24 h-24 object-cover rounded-lg bg-secondary"
             />
             <Button
               variant="destructive"
               size="icon"
               className="absolute -top-2 -right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => handleRemoveImage(index)}
+              onClick={() => handleRemoveImage()}
             >
               <X className="h-4 w-4" />
             </Button>
