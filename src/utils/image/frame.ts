@@ -12,33 +12,38 @@ export const createFrame = async (
 
   // Add logo if provided
   if (logo) {
-    const logoImg = new Image();
-    await new Promise((resolve) => {
-      logoImg.onload = resolve;
-      logoImg.src = logo;
+    const logoImg = await new Promise<HTMLImageElement>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.src = logo;
     });
     
-    const logoSize = size * 0.15;
-    ctx.drawImage(logoImg, 20, 20, logoSize, logoSize);
+    const logoSize = size * 0.15; // 15% of frame size
+    const padding = size * 0.02; // 2% padding
+    ctx.drawImage(logoImg, padding, padding, logoSize, logoSize);
   }
 
   // Add bottom images if provided
   if (bottomImages.length > 0) {
-    const bottomHeight = size * 0.15;
-    const bottomWidth = Math.min(size, size * 0.8);
+    const bottomHeight = size * 0.15; // 15% of frame size
+    const bottomWidth = size * 0.8; // 80% of frame width
     const maxImages = Math.min(3, bottomImages.length);
-    const spacing = size * 0.02;
+    const spacing = size * 0.02; // 2% spacing
     const startY = size - bottomHeight - spacing;
+    const startX = (size - bottomWidth) / 2;
 
-    await Promise.all(bottomImages.map(async (imgSrc, i) => {
-      const img = new Image();
-      await new Promise((resolve) => {
-        img.onload = resolve;
+    await Promise.all(bottomImages.map(async (imgSrc, index) => {
+      if (index >= maxImages) return;
+
+      const img = await new Promise<HTMLImageElement>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
         img.src = imgSrc;
       });
 
       const sectionWidth = (bottomWidth - (spacing * (maxImages - 1))) / maxImages;
-      const x = (size - bottomWidth) / 2 + (i * (sectionWidth + spacing));
+      const x = startX + (index * (sectionWidth + spacing));
+      
       ctx.drawImage(img, x, startY, sectionWidth, bottomHeight);
     }));
   }
