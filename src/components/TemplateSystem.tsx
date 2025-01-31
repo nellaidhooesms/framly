@@ -127,6 +127,13 @@ export const TemplateSystem = ({
     }
   };
 
+  const handleDeleteTemplate = (templateName: string) => {
+    const updatedTemplates = { ...templates };
+    delete updatedTemplates[templateName];
+    setTemplates(updatedTemplates);
+    localStorage.setItem("watermarkTemplates", JSON.stringify(updatedTemplates));
+  };
+
   const handleImport = (importedTemplates: Record<string, WatermarkConfig>, importedConfig: WatermarkConfig) => {
     setTemplates(importedTemplates);
     localStorage.setItem("watermarkTemplates", JSON.stringify(importedTemplates));
@@ -147,6 +154,7 @@ export const TemplateSystem = ({
           onTemplateSelect(template);
           toast.success("Template loaded successfully");
         }}
+        onTemplateDelete={handleDeleteTemplate}
       />
 
       <TemplateImportExport
