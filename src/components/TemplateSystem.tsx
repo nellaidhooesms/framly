@@ -60,7 +60,12 @@ export const TemplateSystem = ({
       const ctx = canvas.getContext('2d')!;
       ctx.drawImage(img, 0, 0, width, height);
       
-      return canvas.toDataURL('image/jpeg', 0.7);
+      // Check if image has transparency
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const hasTransparency = Array.from(imageData.data).some((value, index) => (index + 1) % 4 === 0 && value < 255);
+      
+      // Use PNG for transparent images, JPEG for others
+      return canvas.toDataURL(hasTransparency ? 'image/png' : 'image/jpeg', 0.7);
     };
 
     return {
