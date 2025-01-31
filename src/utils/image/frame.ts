@@ -20,7 +20,13 @@ export const createFrame = async (
     
     const logoSize = size * 0.15; // 15% of frame size
     const padding = size * 0.02; // 2% padding
-    ctx.drawImage(logoImg, padding, padding, logoSize, logoSize);
+    
+    // Preserve aspect ratio for logo
+    const logoAspectRatio = logoImg.width / logoImg.height;
+    const logoWidth = logoSize;
+    const logoHeight = logoSize / logoAspectRatio;
+    
+    ctx.drawImage(logoImg, padding, padding, logoWidth, logoHeight);
   }
 
   // Add bottom images if provided
@@ -44,7 +50,16 @@ export const createFrame = async (
       const sectionWidth = (bottomWidth - (spacing * (maxImages - 1))) / maxImages;
       const x = startX + (index * (sectionWidth + spacing));
       
-      ctx.drawImage(img, x, startY, sectionWidth, bottomHeight);
+      // Preserve aspect ratio for bottom images
+      const imgAspectRatio = img.width / img.height;
+      const imgWidth = sectionWidth;
+      const imgHeight = bottomHeight;
+      const drawWidth = Math.min(imgWidth, imgHeight * imgAspectRatio);
+      const drawHeight = Math.min(imgHeight, imgWidth / imgAspectRatio);
+      const xOffset = (sectionWidth - drawWidth) / 2;
+      const yOffset = (bottomHeight - drawHeight) / 2;
+      
+      ctx.drawImage(img, x + xOffset, startY + yOffset, drawWidth, drawHeight);
     }));
   }
 
