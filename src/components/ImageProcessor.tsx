@@ -111,6 +111,28 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
     }
   }, [processedImages]);
 
+  const handleDownloadAllIndividually = useCallback(async () => {
+    if (processedImages.length === 0) {
+      toast.error("No processed images to download");
+      return;
+    }
+
+    try {
+      processedImages.forEach((imageUrl, index) => {
+        const link = document.createElement('a');
+        link.href = imageUrl;
+        link.download = `processed-image-${index + 1}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+      toast.success("All images downloaded successfully!");
+    } catch (error) {
+      console.error("Error downloading images:", error);
+      toast.error("Error downloading images");
+    }
+  }, [processedImages]);
+
   const handleDownloadSingle = useCallback(async (index: number) => {
     if (!processedImages[index]) {
       toast.error("Image not processed yet");
@@ -184,6 +206,7 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
       <ProcessingControls
         onProcessAll={handleProcess}
         onDownloadAll={handleDownloadAll}
+        onDownloadAllIndividually={handleDownloadAllIndividually}
         hasImages={images.length > 0}
         hasProcessedImages={processedImages.length > 0}
         isProcessing={isProcessing}

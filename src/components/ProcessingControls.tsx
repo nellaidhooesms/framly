@@ -4,6 +4,7 @@ import { Play, Archive, Download } from "lucide-react";
 interface ProcessingControlsProps {
   onProcessAll: () => void;
   onDownloadAll: () => void;
+  onDownloadAllIndividually: () => void;
   hasImages: boolean;
   hasProcessedImages: boolean;
   isProcessing: boolean;
@@ -12,6 +13,7 @@ interface ProcessingControlsProps {
 export const ProcessingControls = ({
   onProcessAll,
   onDownloadAll,
+  onDownloadAllIndividually,
   hasImages,
   hasProcessedImages,
   isProcessing,
@@ -27,14 +29,24 @@ export const ProcessingControls = ({
         Process All Images
       </Button>
       {hasProcessedImages && (
-        <Button
-          onClick={onDownloadAll}
-          variant="secondary"
-          className="w-full"
-        >
-          <Archive className="mr-2 h-4 w-4" />
-          Download All as ZIP
-        </Button>
+        <>
+          <Button
+            onClick={onDownloadAll}
+            variant="secondary"
+            className="w-full"
+          >
+            <Archive className="mr-2 h-4 w-4" />
+            Download as ZIP
+          </Button>
+          <Button
+            onClick={onDownloadAllIndividually}
+            variant="outline"
+            className="w-full"
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Download All
+          </Button>
+        </>
       )}
     </div>
   );
