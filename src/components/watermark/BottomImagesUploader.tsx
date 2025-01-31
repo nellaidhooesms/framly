@@ -1,18 +1,32 @@
 import { ImageUploader } from "../ImageUploader";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
+import { X } from "lucide-react";
 
 interface BottomImagesUploaderProps {
   bottomImages: string[];
   onBottomImagesChange: (images: string[]) => void;
+  description?: string;
 }
 
 export const BottomImagesUploader = ({
   bottomImages,
   onBottomImagesChange,
+  description,
 }: BottomImagesUploaderProps) => {
+  const handleRemoveImage = (index: number) => {
+    onBottomImagesChange(bottomImages.filter((_, i) => i !== index));
+    toast.success("Image removed successfully");
+  };
+
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Bottom Images</h3>
+      <div className="space-y-1">
+        <h3 className="text-lg font-semibold">Bottom Images</h3>
+        {description && (
+          <p className="text-sm text-muted-foreground">{description}</p>
+        )}
+      </div>
       <ImageUploader
         onImagesSelected={(files) => {
           const promises = files.map((file) => {
@@ -24,19 +38,30 @@ export const BottomImagesUploader = ({
           });
 
           Promise.all(promises).then((images) => {
-            onBottomImagesChange([...bottomImages, ...images]);
-            toast.success(`${files.length} bottom images uploaded successfully`);
+            const newImages = [...bottomImages, ...images].slice(0, 3);
+            onBottomImagesChange(newImages);
+            toast.success(`${Math.min(files.length, 3 - bottomImages.length)} bottom images uploaded`);
           });
         }}
+        maxFiles={Math.max(0, 3 - bottomImages.length)}
       />
       <div className="flex gap-4 flex-wrap">
         {bottomImages.map((image, index) => (
-          <img
-            key={index}
-            src={image}
-            alt={`Bottom ${index + 1}`}
-            className="w-24 h-24 object-cover rounded"
-          />
+          <div key={index} className="relative group">
+            <img
+              src={image}
+              alt={`Bottom ${index + 1}`}
+              className="w-24 h-24 object-cover rounded-lg bg-secondary"
+            />
+            <Button
+              variant="destructive"
+              size="icon"
+              className="absolute -top-2 -right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => handleRemoveImage(index)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         ))}
       </div>
     </div>
