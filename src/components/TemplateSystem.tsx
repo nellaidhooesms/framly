@@ -68,7 +68,6 @@ export const TemplateSystem = ({
     return {
       ...config,
       logo: compressImage(config.logo),
-      overlay: compressImage(config.overlay),
       bottomImages: config.bottomImages.map(img => compressImage(img) || ''),
     };
   };

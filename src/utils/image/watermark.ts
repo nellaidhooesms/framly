@@ -1,7 +1,6 @@
 import { WatermarkConfig } from "../../components/WatermarkLayout";
 import { ProcessedImage } from "./types";
 import { createCanvas, hasTransparency } from "./canvas";
-import { addOverlay } from "./watermarkOverlay";
 import { addText } from "./watermarkText";
 import { createFrame } from "./frame";
 
@@ -38,17 +37,6 @@ export const addWatermark = async (
     // Use source-over to preserve transparency
     ctx.globalCompositeOperation = 'source-over';
     ctx.drawImage(frameImg, 0, 0, size, size);
-  }
-  
-  // Add overlay if present
-  if (watermarkConfig.overlay) {
-    await addOverlay(
-      ctx,
-      watermarkConfig.overlay,
-      size,
-      watermarkConfig.position || { x: 50, y: 50 },
-      watermarkConfig.opacity
-    );
   }
   
   // Add text if present
