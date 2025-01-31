@@ -56,13 +56,29 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
 
     const squareResult = await createSquareImage(img, size, filterConfig);
 
-    const watermarkConfig = selectedTemplate !== "default"
-      ? templates[selectedTemplate]
-      : JSON.parse(localStorage.getItem("watermarkConfig") || "{}");
+    let watermarkConfig: WatermarkConfig;
+    
+    if (selectedTemplate !== "default") {
+      watermarkConfig = templates[selectedTemplate];
+    } else {
+      const savedConfig = localStorage.getItem("watermarkConfig");
+      if (!savedConfig) {
+        throw new Error("No watermark configuration found");
+      }
+      watermarkConfig = JSON.parse(savedConfig);
+    }
+
+    // Ensure the watermark config has all required properties
+    const processedWatermarkConfig: WatermarkConfig = {
+      logo: watermarkConfig.logo,
+      bottomImages: watermarkConfig.bottomImages || [],
+      position: watermarkConfig.position || { x: 50, y: 50 },
+      opacity: watermarkConfig.opacity || 1,
+    };
 
     const watermarkResult = await addWatermark(
       squareResult.dataUrl,
-      watermarkConfig,
+      processedWatermarkConfig,
       text,
       textDirection,
       selectedFont

@@ -1,6 +1,6 @@
 import { WatermarkConfig } from "../../components/WatermarkLayout";
 import { ProcessedImage } from "./types";
-import { createCanvas, hasTransparency } from "./canvas";
+import { createCanvas } from "./canvas";
 import { addText } from "./watermarkText";
 import { createFrame } from "./frame";
 
@@ -16,27 +16,34 @@ export const addWatermark = async (
   await new Promise((resolve) => (img.onload = resolve));
   
   const size = img.width;
-  const { canvas, ctx } = createCanvas(size, size);
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d')!;
+  
+  canvas.width = size;
+  canvas.height = size;
   
   // Draw base image
   ctx.drawImage(img, 0, 0, size, size);
   
-  // Create and add frame (logo + bottom images)
-  if (watermarkConfig.logo || watermarkConfig.bottomImages?.length > 0) {
+  // Create and add frame if logo or bottom images exist
+  if (watermarkConfig.logo || (watermarkConfig.bottomImages && watermarkConfig.bottomImages.length > 0)) {
     const frame = await createFrame(
       watermarkConfig.logo,
-      watermarkConfig.bottomImages || []
+      watermarkConfig.bottomImages || [],
+      size
     );
     
     const frameImg = new Image();
-    await new Promise((resolve) => {
-      frameImg.onload = resolve;
-      frameImg.src = frame;
-    });
+    frameImg.src = frame;
+    await new Promise((resolve) => (frameImg.onload = resolve));
     
-    // Use source-over to preserve transparency
-    ctx.globalCompositeOperation = 'source-over';
+    // Apply opacity if specified
+    if (typeof watermarkConfig.opacity === 'number') {
+      ctx.globalAlpha = watermarkConfig.opacity;
+    }
+    
     ctx.drawImage(frameImg, 0, 0, size, size);
+    ctx.globalAlpha = 1.0; // Reset opacity
   }
   
   // Add text if present
@@ -46,6 +53,6 @@ export const addWatermark = async (
   
   return {
     dataUrl: canvas.toDataURL('image/png', 1.0),
-    hasTransparency: hasTransparency(ctx, size, size)
+    hasTransparency: true
   };
 };
