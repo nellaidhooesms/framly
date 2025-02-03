@@ -34,8 +34,9 @@ export const ImagePreview = ({
       />
       {text && (
         <div
-          className="absolute bottom-0 left-0 right-0 p-4"
+          className="absolute left-0 right-0 p-4"
           style={{
+            bottom: "40px",
             fontFamily: selectedFont,
             direction: textDirection,
             textAlign: textDirection === "rtl" ? "right" : "left",
