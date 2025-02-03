@@ -1,6 +1,5 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Label } from "./ui/label";
-import { Slider } from "./ui/slider";
 
 interface ImageControlsProps {
   format: string;
@@ -29,22 +28,6 @@ export const ImageControls = ({
             <SelectItem value="image/webp">WEBP</SelectItem>
           </SelectContent>
         </Select>
-      </div>
-      
-      <div className="space-y-2">
-        <Label>Image Size (px)</Label>
-        <div className="flex items-center gap-4">
-          <Slider
-            defaultValue={[size]}
-            value={[size]}
-            onValueChange={(values) => onSizeChange(values[0])}
-            min={300}
-            max={2000}
-            step={100}
-            className="flex-1"
-          />
-          <span className="min-w-[60px] text-right">{size}px</span>
-        </div>
       </div>
     </div>
   );
