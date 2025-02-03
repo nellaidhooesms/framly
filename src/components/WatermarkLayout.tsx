@@ -12,24 +12,15 @@ interface WatermarkLayoutProps {
 export interface WatermarkConfig {
   logo?: string;
   bottomImages: string[];
-  position?: {
-    x: number;
-    y: number;
-  };
-  opacity?: number;
 }
 
 export const WatermarkLayout = ({ onSave }: WatermarkLayoutProps) => {
   const [logo, setLogo] = useState<string>();
   const [bottomImages, setBottomImages] = useState<string[]>([]);
-  const [position, setPosition] = useState({ x: 50, y: 50 });
-  const [opacity, setOpacity] = useState(1);
 
   const getCurrentConfig = (): WatermarkConfig => ({
     logo,
     bottomImages,
-    position,
-    opacity,
   });
 
   const handleSave = () => {
@@ -70,11 +61,7 @@ export const WatermarkLayout = ({ onSave }: WatermarkLayoutProps) => {
             config={{
               logo,
               bottomImages,
-              position,
-              opacity,
             }}
-            onPositionChange={(x, y) => setPosition({ x, y })}
-            onOpacityChange={setOpacity}
           />
         </Card>
       </div>
