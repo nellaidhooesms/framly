@@ -37,13 +37,7 @@ export const addWatermark = async (
     frameImg.src = frame;
     await new Promise((resolve) => (frameImg.onload = resolve));
     
-    // Apply opacity if specified
-    if (typeof watermarkConfig.opacity === 'number') {
-      ctx.globalAlpha = watermarkConfig.opacity;
-    }
-    
     ctx.drawImage(frameImg, 0, 0, size, size);
-    ctx.globalAlpha = 1.0; // Reset opacity
   }
   
   // Add text if present
