@@ -35,8 +35,9 @@ export const ImageControls = ({
         <Label>Image Size (px)</Label>
         <div className="flex items-center gap-4">
           <Slider
+            defaultValue={[size]}
             value={[size]}
-            onValueChange={(value) => onSizeChange(value[0])}
+            onValueChange={(values) => onSizeChange(values[0])}
             min={300}
             max={2000}
             step={100}
