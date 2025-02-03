@@ -16,11 +16,7 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
     processedImages,
     isProcessing,
     filterConfig,
-    format,
-    size,
     setFilterConfig,
-    setFormat,
-    setSize,
     handleImagesSelected,
     handleProcess,
     handleRemoveImage,
@@ -47,8 +43,6 @@ export const ImageProcessor = ({ text, textDirection, selectedFont }: ImageProce
         onProcess={() => handleProcess(text, textDirection, selectedFont)}
         filterConfig={filterConfig}
         onFilterChange={setFilterConfig}
-        onFormatChange={setFormat}
-        onSizeChange={setSize}
         onRemove={handleRemoveImage}
         onDownloadSingle={handleDownloadSingle}
         processedImages={processedImages}
