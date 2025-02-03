@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { toast } from "sonner";
 import { WatermarkPreview } from "./WatermarkPreview";
-import { TemplateSystem } from "./TemplateSystem";
 import { LogoUploader } from "./watermark/LogoUploader";
 import { BottomImagesUploader } from "./watermark/BottomImagesUploader";
 import { Card } from "./ui/card";
@@ -47,16 +45,6 @@ export const WatermarkLayout = ({ onSave }: WatermarkLayoutProps) => {
             Upload your logo and bottom images to create a 1080x1080 frame
           </p>
         </div>
-
-        <TemplateSystem
-          currentConfig={getCurrentConfig()}
-          onTemplateSelect={(config) => {
-            setLogo(config.logo);
-            setBottomImages(config.bottomImages);
-            setPosition(config.position || { x: 50, y: 50 });
-            setOpacity(config.opacity || 1);
-          }}
-        />
 
         <LogoUploader 
           logo={logo} 
