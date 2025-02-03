@@ -1,6 +1,5 @@
 import { memo } from "react";
 import { ImagePreview } from "./ImagePreview";
-import { ImageControls } from "./ImageControls";
 import { FilterConfig } from "./ImageFilters";
 import { Button } from "./ui/button";
 import { Download, Trash2 } from "lucide-react";
@@ -14,8 +13,6 @@ interface ImageListProps {
   onProcess: (index: number) => void;
   filterConfig: FilterConfig;
   onFilterChange: (config: FilterConfig) => void;
-  onFormatChange: (format: string) => void;
-  onSizeChange: (size: number) => void;
   onRemove: (index: number) => void;
   onDownloadSingle?: (index: number) => void;
   processedImages?: string[];
@@ -30,8 +27,6 @@ export const ImageList = memo(({
   onProcess,
   filterConfig,
   onFilterChange,
-  onFormatChange,
-  onSizeChange,
   onRemove,
   onDownloadSingle,
   processedImages = [],
@@ -70,12 +65,6 @@ export const ImageList = memo(({
               )}
             </div>
           </div>
-          <ImageControls
-            format="image/jpeg"
-            onFormatChange={onFormatChange}
-            size={1080}
-            onSizeChange={onSizeChange}
-          />
         </div>
       ))}
     </div>
