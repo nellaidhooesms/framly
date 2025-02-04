@@ -6,9 +6,10 @@ import { Progress } from "./ui/progress";
 interface ImageUploaderProps {
   onImagesSelected: (files: File[]) => void;
   maxFiles?: number;
+  accept?: Record<string, string[]>;
 }
 
-export const ImageUploader = ({ onImagesSelected, maxFiles }: ImageUploaderProps) => {
+export const ImageUploader = ({ onImagesSelected, maxFiles, accept }: ImageUploaderProps) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -49,9 +50,7 @@ export const ImageUploader = ({ onImagesSelected, maxFiles }: ImageUploaderProps
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".webp"],
-    },
+    accept,
     maxFiles,
     disabled: isUploading,
   });

@@ -41,7 +41,9 @@ export const WatermarkImageUploader = ({
       <ImageUploader
         onImagesSelected={handleImageUpload}
         maxFiles={1}
-        accept="image/png"
+        accept={{
+          "image/png": [".png"],
+        }}
       />
 
       {watermark.image && (
