@@ -43,7 +43,10 @@ const Index = () => {
     <div className="min-h-screen bg-background text-foreground p-4 sm:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h1 className="text-2xl sm:text-3xl font-bold">{t("socialMediaImageProcessor")}</h1>
+          <div className="flex items-center gap-3">
+            <img src="/framly-logo.png" alt="FRAMLY" className="w-12 h-12" />
+            <h1 className="text-2xl sm:text-3xl font-bold">FRAMLY</h1>
+          </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
             <Button variant="outline" onClick={handleReset} className="w-full sm:w-auto">
               <Trash2 className="mr-2 h-4 w-4" />
