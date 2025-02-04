@@ -34,7 +34,6 @@ const resources = {
       "watermarkImage": "Watermark Image",
       "watermarkDescription": "Add a PNG watermark with customizable opacity, size, and position",
       "saveFrameConfiguration": "Save Frame Configuration",
-      "preview": "Preview (1080x1080)",
       "opacity": "Opacity",
       "size": "Size (%)",
       "positionX": "Position X (%)",
