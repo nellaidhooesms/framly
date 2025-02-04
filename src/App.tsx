@@ -16,10 +16,10 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="light" storageKey="app-theme">
       <TooltipProvider>
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+          <LanguageToggle />
           <ThemeToggle />
         </div>
-        <LanguageToggle />
         <Toaster />
         <Sonner />
         <BrowserRouter>

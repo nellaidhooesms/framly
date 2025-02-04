@@ -14,7 +14,6 @@ export const LanguageToggle = () => {
       variant="outline"
       size="sm"
       onClick={toggleLanguage}
-      className="fixed top-4 right-16 z-50"
     >
       {i18n.language === 'en' ? 'ދިވެހި' : 'English'}
     </Button>
