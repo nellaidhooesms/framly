@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const WatermarkConfig = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSave = (config: WatermarkConfigType) => {
     try {
@@ -26,9 +28,9 @@ const WatermarkConfig = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Watermark Configuration</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">{t('watermarkConfigTitle')}</h1>
             <p className="text-muted-foreground mt-1">
-              Configure your 1080x1080 frame layout with logo and bottom images
+              {t('watermarkConfigDescription')}
             </p>
           </div>
         </div>

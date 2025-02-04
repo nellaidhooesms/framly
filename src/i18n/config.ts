@@ -38,7 +38,10 @@ const resources = {
       "size": "Size (%)",
       "positionX": "Position X (%)",
       "positionY": "Position Y (%)",
-      "noImageSelected": "No image selected"
+      "noImageSelected": "No image selected",
+      "backToHome": "Back to Home",
+      "watermarkConfigTitle": "Watermark Configuration",
+      "watermarkConfigDescription": "Configure your 1080x1080 frame layout with logo and bottom images"
     }
   },
   dv: {
@@ -63,7 +66,24 @@ const resources = {
       "rightToLeft": "ކަނާތުން ވައަތަށް",
       "preview": "ޕްރިވިއު",
       "enterTextToPreview": "ޕްރިވިއު ކުރުމަށް ޓެކްސްޓް ލިޔުއްވާ",
-      "uploadDescription": "ސޯޝަލް މީޑިއާއަށް ފޮޓޯ ޕްރޮސެސް ކުރުމަށް ފޮޓޯ އަޕްލޯޑް ކުރައްވާ - ހިމެނެނީ ހަތަރެސްކަން ކްރޮޕިންގ، ޕޯޓްރެއިޓް ފޮޓޯތަކަށް ބެކްގްރައުންޑް ބްލަރ، އަދި ވޯޓަރމާކް"
+      "uploadDescription": "ސޯޝަލް މީޑިއާއަށް ފޮޓޯ ޕްރޮސެސް ކުރުމަށް ފޮޓޯ އަޕްލޯޑް ކުރައްވާ - ހިމެނެނީ ހަތަރެސްކަން ކްރޮޕިންގ، ޕޯޓްރެއިޓް ފޮޓޯތަކަށް ބެކްގްރައުންޑް ބްލަރ، އަދި ވޯޓަރމާކް",
+      "frameConfiguration": "ފްރޭމް ކޮންފިގަރޭޝަން",
+      "frameConfigDescription": "1080x1080 ފްރޭމެއް ހެދުމަށް ލޯގޯ އަދި ތިރީގެ ފޮޓޯތައް އަޕްލޯޑް ކުރައްވާ",
+      "logoTopLeft": "ލޯގޯ (މަތީ ވައަތު ކަނުގައި)",
+      "logoDescription": "ލޯގޯ ބެހެއްޓޭނީ މަތީ ވައަތު ކަނުގައި (ފްރޭމްގެ 15%)",
+      "bottomImage": "ތިރީގެ ފޮޓޯ",
+      "bottomImageDescription": "ތިރީގައި ބެހެއްޓޭނީ 3 ފޮޓޯ (އުސްމިނުގައި 15%، ޖުމްލަ ފުޅާމިނުގައި 80%)",
+      "watermarkImage": "ވޯޓަރމާކް ފޮޓޯ",
+      "watermarkDescription": "އޯޕަސިޓީ، ސައިޒް، އަދި ޕޮޒިޝަން ބަދަލުކުރެވޭ PNG ވޯޓަރމާކެއް އިތުރުކުރައްވާ",
+      "saveFrameConfiguration": "ފްރޭމް ކޮންފިގަރޭޝަން ސޭވްކުރައްވާ",
+      "opacity": "އޯޕަސިޓީ",
+      "size": "ސައިޒް (%)",
+      "positionX": "ޕޮޒިޝަން X (%)",
+      "positionY": "ޕޮޒިޝަން Y (%)",
+      "noImageSelected": "ފޮޓޯއެއް ހޮވިފައެއް ނުވޭ",
+      "backToHome": "މައި ޞަފްޙާއަށް",
+      "watermarkConfigTitle": "ވޯޓަރމާކް ކޮންފިގަރޭޝަން",
+      "watermarkConfigDescription": "ލޯގޯ އަދި ތިރީގެ ފޮޓޯތަކާއެކު 1080x1080 ފްރޭމް ލޭއައުޓް ކޮންފިގަރ ކުރައްވާ"
     }
   }
 };
