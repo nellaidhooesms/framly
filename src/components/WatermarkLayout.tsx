@@ -5,6 +5,7 @@ import { LogoUploader } from "./watermark/LogoUploader";
 import { BottomImagesUploader } from "./watermark/BottomImagesUploader";
 import { WatermarkImageUploader } from "./watermark/WatermarkImageUploader";
 import { Card } from "./ui/card";
+import { useTranslation } from "react-i18next";
 
 interface WatermarkLayoutProps {
   onSave: (layout: WatermarkConfig) => void;
@@ -25,6 +26,7 @@ export interface WatermarkConfig {
 }
 
 export const WatermarkLayout = ({ onSave }: WatermarkLayoutProps) => {
+  const { t } = useTranslation();
   const [logo, setLogo] = useState<string>();
   const [bottomImages, setBottomImages] = useState<string[]>([]);
   const [watermark, setWatermark] = useState<WatermarkConfig["watermark"]>({
@@ -47,38 +49,38 @@ export const WatermarkLayout = ({ onSave }: WatermarkLayoutProps) => {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <Card className="p-6 space-y-8">
         <div className="space-y-2">
-          <h2 className="text-lg font-semibold">Frame Configuration</h2>
+          <h2 className="text-lg font-semibold">{t('frameConfiguration')}</h2>
           <p className="text-sm text-muted-foreground">
-            Upload your logo and bottom images to create a 1080x1080 frame
+            {t('frameConfigDescription')}
           </p>
         </div>
 
         <LogoUploader 
           logo={logo} 
           onLogoChange={setLogo}
-          description="Logo will be placed in the top-left corner (15% of frame size)"
+          description={t('logoDescription')}
         />
         
         <BottomImagesUploader
           bottomImages={bottomImages}
           onBottomImagesChange={setBottomImages}
-          description="Up to 3 images will be placed at the bottom (15% height, 80% total width)"
+          description={t('bottomImageDescription')}
         />
 
         <WatermarkImageUploader
           watermark={watermark}
           onWatermarkChange={setWatermark}
-          description="Add a PNG watermark with customizable opacity, size, and position"
+          description={t('watermarkDescription')}
         />
 
         <Button onClick={handleSave} className="w-full">
-          Save Frame Configuration
+          {t('saveFrameConfiguration')}
         </Button>
       </Card>
 
       <div className="space-y-4">
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Preview (1080x1080)</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('preview')}</h3>
           <WatermarkPreview
             config={{
               logo,

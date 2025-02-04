@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Skeleton } from "./ui/skeleton";
 import { WatermarkConfig } from "./WatermarkLayout";
 import { createFrame } from "../utils/image/frame";
+import { useTranslation } from "react-i18next";
 
 interface WatermarkPreviewProps {
   imageUrl?: string;
@@ -12,6 +13,7 @@ export const WatermarkPreview = ({
   imageUrl,
   config,
 }: WatermarkPreviewProps) => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [frameUrl, setFrameUrl] = useState<string>();
 
@@ -50,7 +52,7 @@ export const WatermarkPreview = ({
         )}
         {!imageUrl && !frameUrl && (
           <div className="flex items-center justify-center h-full text-muted-foreground">
-            No image selected
+            {t('noImageSelected')}
           </div>
         )}
       </div>

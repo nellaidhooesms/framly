@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { Slider } from "../ui/slider";
 import { Label } from "../ui/label";
 import { WatermarkConfig } from "../WatermarkLayout";
+import { useTranslation } from "react-i18next";
 
 interface WatermarkImageUploaderProps {
   watermark: WatermarkConfig["watermark"];
@@ -15,6 +16,8 @@ export const WatermarkImageUploader = ({
   onWatermarkChange,
   description,
 }: WatermarkImageUploaderProps) => {
+  const { t } = useTranslation();
+
   const handleImageUpload = (files: File[]) => {
     if (files[0]) {
       const reader = new FileReader();
@@ -32,7 +35,7 @@ export const WatermarkImageUploader = ({
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h3 className="text-lg font-semibold">Watermark Image</h3>
+        <h3 className="text-lg font-semibold">{t('watermarkImage')}</h3>
         {description && (
           <p className="text-sm text-muted-foreground">{description}</p>
         )}
@@ -49,7 +52,7 @@ export const WatermarkImageUploader = ({
       {watermark.image && (
         <div className="space-y-6">
           <div className="space-y-4">
-            <Label>Opacity</Label>
+            <Label>{t('opacity')}</Label>
             <Slider
               value={[watermark.opacity * 100]}
               onValueChange={(value) =>
@@ -65,7 +68,7 @@ export const WatermarkImageUploader = ({
           </div>
 
           <div className="space-y-4">
-            <Label>Size (%)</Label>
+            <Label>{t('size')}</Label>
             <Slider
               value={[watermark.size]}
               onValueChange={(value) =>
@@ -81,7 +84,7 @@ export const WatermarkImageUploader = ({
           </div>
 
           <div className="space-y-4">
-            <Label>Position X (%)</Label>
+            <Label>{t('positionX')}</Label>
             <Slider
               value={[watermark.position.x]}
               onValueChange={(value) =>
@@ -100,7 +103,7 @@ export const WatermarkImageUploader = ({
           </div>
 
           <div className="space-y-4">
-            <Label>Position Y (%)</Label>
+            <Label>{t('positionY')}</Label>
             <Slider
               value={[watermark.position.y]}
               onValueChange={(value) =>

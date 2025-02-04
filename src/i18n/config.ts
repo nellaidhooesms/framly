@@ -24,7 +24,22 @@ const resources = {
       "rightToLeft": "Right to Left",
       "preview": "Preview",
       "enterTextToPreview": "Enter text to preview",
-      "uploadDescription": "Upload your images to process them for social media - includes square cropping, background blur for portrait images, and watermarking."
+      "uploadDescription": "Upload your images to process them for social media - includes square cropping, background blur for portrait images, and watermarking.",
+      "frameConfiguration": "Frame Configuration",
+      "frameConfigDescription": "Upload your logo and bottom images to create a 1080x1080 frame",
+      "logoTopLeft": "Logo (Top Left)",
+      "logoDescription": "Logo will be placed in the top-left corner (15% of frame size)",
+      "bottomImage": "Bottom Image",
+      "bottomImageDescription": "Up to 3 images will be placed at the bottom (15% height, 80% total width)",
+      "watermarkImage": "Watermark Image",
+      "watermarkDescription": "Add a PNG watermark with customizable opacity, size, and position",
+      "saveFrameConfiguration": "Save Frame Configuration",
+      "preview": "Preview (1080x1080)",
+      "opacity": "Opacity",
+      "size": "Size (%)",
+      "positionX": "Position X (%)",
+      "positionY": "Position Y (%)",
+      "noImageSelected": "No image selected"
     }
   },
   dv: {
