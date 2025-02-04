@@ -12,7 +12,19 @@ const resources = {
       "downloadAll": "Download All",
       "downloadSeparately": "Download Separately",
       "reset": "Reset All",
-      "watermarkSettings": "Watermark Settings"
+      "watermarkSettings": "Watermark Settings",
+      "socialMediaImageProcessor": "Social Media Image Processor",
+      "resetAll": "Reset All",
+      "watermarkSettingsButton": "Watermark Settings",
+      "textConfiguration": "Text Configuration",
+      "imageDescription": "Image Description",
+      "enterImageDescription": "Enter image description",
+      "textDirection": "Text Direction",
+      "leftToRight": "Left to Right",
+      "rightToLeft": "Right to Left",
+      "preview": "Preview",
+      "enterTextToPreview": "Enter text to preview",
+      "uploadDescription": "Upload your images to process them for social media - includes square cropping, background blur for portrait images, and watermarking."
     }
   },
   dv: {
@@ -25,7 +37,19 @@ const resources = {
       "downloadAll": "ހުރިހާ ފޮޓޯއެއް ޑައުންލޯޑް ކުރުން",
       "downloadSeparately": "ވަކިވަކިން ޑައުންލޯޑް ކުރުން",
       "reset": "އަލުން ފަށާ",
-      "watermarkSettings": "ވޯޓަރމާކް ސެޓިންގްސް"
+      "watermarkSettings": "ވޯޓަރމާކް ސެޓިންގްސް",
+      "socialMediaImageProcessor": "ސޯޝަލް މީޑިއާ އިމޭޖް ޕްރޮސެސަރ",
+      "resetAll": "އަލުން ފަށާ",
+      "watermarkSettingsButton": "ވޯޓަރމާކް ސެޓިންގްސް",
+      "textConfiguration": "ޓެކްސްޓް ކޮންފިގަރޭޝަން",
+      "imageDescription": "ފޮޓޯގެ ތަފްސީލް",
+      "enterImageDescription": "ފޮޓޯގެ ތަފްސީލް ލިޔުއްވާ",
+      "textDirection": "ޓެކްސްޓްގެ ދިމާލުން",
+      "leftToRight": "ވައަތުން ކަނާތަށް",
+      "rightToLeft": "ކަނާތުން ވައަތަށް",
+      "preview": "ޕްރިވިއު",
+      "enterTextToPreview": "ޕްރިވިއު ކުރުމަށް ޓެކްސްޓް ލިޔުއްވާ",
+      "uploadDescription": "ސޯޝަލް މީޑިއާއަށް ފޮޓޯ ޕްރޮސެސް ކުރުމަށް ފޮޓޯ އަޕްލޯޑް ކުރައްވާ - ހިމެނެނީ ހަތަރެސްކަން ކްރޮޕިންގ، ޕޯޓްރެއިޓް ފޮޓޯތަކަށް ބެކްގްރައުންޑް ބްލަރ، އަދި ވޯޓަރމާކް"
     }
   }
 };

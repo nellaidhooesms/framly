@@ -5,10 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { TextConfiguration } from "../components/watermark/TextConfiguration";
 import { useState } from "react";
-import { ImagePreview } from "../components/ImagePreview";
+import { useTranslation } from "react-i18next";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [text, setText] = useState("");
   const [textDirection, setTextDirection] = useState<"ltr" | "rtl">("ltr");
   const [selectedFont, setSelectedFont] = useState("Arial");
@@ -16,7 +17,7 @@ const Index = () => {
   const handleReset = () => {
     localStorage.removeItem('watermarkConfig');
     window.location.reload();
-    toast.success("All images and settings have been reset");
+    toast.success(t("resetAll"));
   };
 
   const handleCustomFontUpload = async (file: File) => {
@@ -25,7 +26,7 @@ const Index = () => {
       const fontUrl = URL.createObjectURL(file);
       
       const font = new FontFace(fontName, `url(${fontUrl})`, {
-        unicodeRange: 'U+0780-07BF' // Thaana Script range
+        unicodeRange: 'U+0780-07BF'
       });
 
       await font.load();
@@ -42,15 +43,15 @@ const Index = () => {
     <div className="min-h-screen bg-background text-foreground p-4 sm:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h1 className="text-2xl sm:text-3xl font-bold">Social Media Image Processor</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">{t("socialMediaImageProcessor")}</h1>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
             <Button variant="outline" onClick={handleReset} className="w-full sm:w-auto">
               <Trash2 className="mr-2 h-4 w-4" />
-              Reset All
+              {t("resetAll")}
             </Button>
             <Button onClick={() => navigate('/watermark-config')} className="w-full sm:w-auto">
               <Settings className="mr-2 h-4 w-4" />
-              Watermark Settings
+              {t("watermarkSettingsButton")}
             </Button>
           </div>
         </div>
@@ -74,15 +75,14 @@ const Index = () => {
                 textAlign: textDirection === 'rtl' ? 'right' : 'left'
               }}
             >
-              <h3 className="text-lg font-semibold mb-2">Preview</h3>
-              <p className="break-words">{text || "Enter text to preview"}</p>
+              <h3 className="text-lg font-semibold mb-2">{t("preview")}</h3>
+              <p className="break-words">{text || t("enterTextToPreview")}</p>
             </div>
           </div>
           
           <div>
             <p className="text-muted-foreground mb-4">
-              Upload your images to process them for social media - includes square cropping, 
-              background blur for portrait images, and watermarking.
+              {t("uploadDescription")}
             </p>
             <ImageProcessor 
               text={text}

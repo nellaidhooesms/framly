@@ -2,6 +2,7 @@ import { Input } from "../ui/input";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import { FontSelector } from "../FontSelector";
+import { useTranslation } from "react-i18next";
 
 interface TextConfigurationProps {
   text: string;
@@ -22,14 +23,16 @@ export const TextConfiguration = ({
   onFontChange,
   onCustomFontUpload,
 }: TextConfigurationProps) => {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-4 p-4 bg-secondary rounded-lg">
-      <h3 className="text-lg font-semibold">Text Configuration</h3>
+      <h3 className="text-lg font-semibold">{t("textConfiguration")}</h3>
       <div className="space-y-2">
-        <Label htmlFor="text-input">Image Description</Label>
+        <Label htmlFor="text-input">{t("imageDescription")}</Label>
         <Input
           id="text-input"
-          placeholder="Enter image description"
+          placeholder={t("enterImageDescription")}
           value={text}
           onChange={(e) => onTextChange(e.target.value)}
           style={{ 
@@ -47,7 +50,7 @@ export const TextConfiguration = ({
       />
 
       <div className="space-y-2">
-        <Label>Text Direction</Label>
+        <Label>{t("textDirection")}</Label>
         <RadioGroup
           value={textDirection}
           onValueChange={onDirectionChange}
@@ -55,11 +58,11 @@ export const TextConfiguration = ({
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="ltr" id="ltr" />
-            <Label htmlFor="ltr">Left to Right</Label>
+            <Label htmlFor="ltr">{t("leftToRight")}</Label>
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="rtl" id="rtl" />
-            <Label htmlFor="rtl">Right to Left</Label>
+            <Label htmlFor="rtl">{t("rightToLeft")}</Label>
           </div>
         </RadioGroup>
       </div>
