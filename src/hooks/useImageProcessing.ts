@@ -35,17 +35,31 @@ export const useImageProcessing = () => {
     if (!savedConfig) {
       throw new Error("No watermark configuration found");
     }
+    
     const watermarkConfig: WatermarkConfig = JSON.parse(savedConfig);
 
-    const watermarkResult = await addWatermark(
-      squareResult.dataUrl,
+    // Create a new canvas to apply the watermark
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d')!;
+
+    // Draw the squared image
+    const squareImage = new Image();
+    squareImage.src = squareResult.dataUrl;
+    await new Promise((resolve) => (squareImage.onload = resolve));
+    ctx.drawImage(squareImage, 0, 0);
+
+    // Apply watermark
+    const result = await addWatermark(
+      canvas.toDataURL('image/png'),
       watermarkConfig,
       text,
       textDirection,
       selectedFont
     );
 
-    return watermarkResult.dataUrl;
+    return result.dataUrl;
   };
 
   const handleProcess = async (text?: string, textDirection?: "ltr" | "rtl", selectedFont?: string) => {

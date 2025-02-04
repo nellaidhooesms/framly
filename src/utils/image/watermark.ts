@@ -15,6 +15,18 @@ export const addWatermark = async (
   const img = await loadImage(imageUrl);
   ctx.drawImage(img, 0, 0, size, size);
 
+  // Add watermark if available
+  if (watermarkConfig.watermark?.image) {
+    const watermarkImg = await loadImage(watermarkConfig.watermark.image);
+    const watermarkSize = (size * watermarkConfig.watermark.size) / 100;
+    const watermarkX = (size * watermarkConfig.watermark.position.x) / 100 - watermarkSize / 2;
+    const watermarkY = (size * watermarkConfig.watermark.position.y) / 100 - watermarkSize / 2;
+
+    ctx.globalAlpha = watermarkConfig.watermark.opacity;
+    ctx.drawImage(watermarkImg, watermarkX, watermarkY, watermarkSize, watermarkSize);
+    ctx.globalAlpha = 1;
+  }
+
   // Add frame if available
   if (watermarkConfig.logo || watermarkConfig.bottomImages.length > 0) {
     const frame = await createFrame(watermarkConfig.logo, watermarkConfig.bottomImages);
