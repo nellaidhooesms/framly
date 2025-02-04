@@ -17,13 +17,13 @@ export const WatermarkPreview = ({
 
   useEffect(() => {
     const generateFrame = async () => {
-      if (config.logo || config.bottomImages.length > 0) {
-        const frame = await createFrame(config.logo, config.bottomImages);
+      if (config.logo || config.bottomImages.length > 0 || config.watermark?.image) {
+        const frame = await createFrame(config.logo, config.bottomImages, config.watermark);
         setFrameUrl(frame);
       }
     };
     generateFrame();
-  }, [config.logo, config.bottomImages]);
+  }, [config.logo, config.bottomImages, config.watermark]);
 
   const handleImageLoad = () => {
     setIsLoading(false);

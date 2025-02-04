@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { WatermarkPreview } from "./WatermarkPreview";
 import { LogoUploader } from "./watermark/LogoUploader";
 import { BottomImagesUploader } from "./watermark/BottomImagesUploader";
+import { WatermarkImageUploader } from "./watermark/WatermarkImageUploader";
 import { Card } from "./ui/card";
 
 interface WatermarkLayoutProps {
@@ -12,15 +13,30 @@ interface WatermarkLayoutProps {
 export interface WatermarkConfig {
   logo?: string;
   bottomImages: string[];
+  watermark?: {
+    image?: string;
+    opacity: number;
+    size: number;
+    position: {
+      x: number;
+      y: number;
+    };
+  };
 }
 
 export const WatermarkLayout = ({ onSave }: WatermarkLayoutProps) => {
   const [logo, setLogo] = useState<string>();
   const [bottomImages, setBottomImages] = useState<string[]>([]);
+  const [watermark, setWatermark] = useState<WatermarkConfig["watermark"]>({
+    opacity: 0.5,
+    size: 30,
+    position: { x: 50, y: 50 },
+  });
 
   const getCurrentConfig = (): WatermarkConfig => ({
     logo,
     bottomImages,
+    watermark,
   });
 
   const handleSave = () => {
@@ -49,6 +65,12 @@ export const WatermarkLayout = ({ onSave }: WatermarkLayoutProps) => {
           description="Up to 3 images will be placed at the bottom (15% height, 80% total width)"
         />
 
+        <WatermarkImageUploader
+          watermark={watermark}
+          onWatermarkChange={setWatermark}
+          description="Add a PNG watermark with customizable opacity, size, and position"
+        />
+
         <Button onClick={handleSave} className="w-full">
           Save Frame Configuration
         </Button>
@@ -61,6 +83,7 @@ export const WatermarkLayout = ({ onSave }: WatermarkLayoutProps) => {
             config={{
               logo,
               bottomImages,
+              watermark,
             }}
           />
         </Card>
