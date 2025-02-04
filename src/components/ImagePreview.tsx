@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Skeleton } from "./ui/skeleton";
 import { Play } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ImagePreviewProps {
   src: string;
@@ -20,6 +21,7 @@ export const ImagePreview = ({
   selectedFont,
 }: ImagePreviewProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="relative rounded-lg overflow-hidden animate-fade-up">
@@ -49,7 +51,7 @@ export const ImagePreview = ({
         {isProcessing ? (
           <div className="flex flex-col items-center gap-2">
             <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            <span className="text-white text-sm font-medium">Processing...</span>
+            <span className="text-white text-sm font-medium">{t('processing')}</span>
           </div>
         ) : (
           <button
@@ -57,7 +59,7 @@ export const ImagePreview = ({
             className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
           >
             <Play className="w-4 h-4" />
-            Process
+            {t('processImage')}
           </button>
         )}
       </div>
