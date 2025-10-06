@@ -37,26 +37,30 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 sm:p-8">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background-secondary text-foreground p-4 sm:p-8">
+      <div className="max-w-6xl mx-auto space-y-8">
         <Header onReset={handleReset} />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <TextConfigurationSection
-            text={text}
-            textDirection={textDirection}
-            selectedFont={selectedFont}
-            onTextChange={setText}
-            onDirectionChange={setTextDirection}
-            onFontChange={setSelectedFont}
-            onCustomFontUpload={handleCustomFontUpload}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="animate-slide-in-right" style={{ animationDelay: '0.1s' }}>
+            <TextConfigurationSection
+              text={text}
+              textDirection={textDirection}
+              selectedFont={selectedFont}
+              onTextChange={setText}
+              onDirectionChange={setTextDirection}
+              onFontChange={setSelectedFont}
+              onCustomFontUpload={handleCustomFontUpload}
+            />
+          </div>
           
-          <ImageProcessingSection
-            text={text}
-            textDirection={textDirection}
-            selectedFont={selectedFont}
-          />
+          <div className="animate-slide-in-right" style={{ animationDelay: '0.2s' }}>
+            <ImageProcessingSection
+              text={text}
+              textDirection={textDirection}
+              selectedFont={selectedFont}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -25,6 +25,9 @@
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
     --radius: 0.5rem;
+    --shadow: 240 5.9% 10% / 0.05;
+    --shadow-md: 240 5.9% 10% / 0.1;
+    --shadow-lg: 240 5.9% 10% / 0.15;
   }
 
   .dark {
@@ -48,6 +51,23 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
+    --shadow: 0 0% 0% / 0.1;
+    --shadow-md: 0 0% 0% / 0.2;
+    --shadow-lg: 0 0% 0% / 0.3;
+  }
+}
+
+@layer utilities {
+  .glass-effect {
+    @apply bg-background/80 backdrop-blur-sm;
+  }
+  
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+  
+  .smooth-transition {
+    @apply transition-all duration-300 ease-in-out;
   }
 }
 

@@ -34,15 +34,18 @@ export const TextConfigurationSection = ({
         onCustomFontUpload={onCustomFontUpload}
       />
       <div 
-        className="p-4 bg-secondary rounded-lg"
+        className="p-6 bg-secondary rounded-lg shadow-md smooth-transition hover:shadow-lg border border-border/50 animate-fade-in"
         style={{ 
           fontFamily: selectedFont,
           direction: textDirection,
           textAlign: textDirection === 'rtl' ? 'right' : 'left'
         }}
       >
-        <h3 className="text-lg font-semibold mb-2">{t('preview')}</h3>
-        <p className="break-words">{text || t('enterTextToPreview')}</p>
+        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+          <span className="w-1 h-5 bg-primary rounded-full"></span>
+          {t('preview')}
+        </h3>
+        <p className="break-words text-muted-foreground leading-relaxed">{text || t('enterTextToPreview')}</p>
       </div>
     </div>
   );

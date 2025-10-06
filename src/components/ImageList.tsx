@@ -32,10 +32,14 @@ export const ImageList = memo(({
   processedImages = [],
 }: ImageListProps) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {images.map((image, index) => (
-        <div key={index} className="space-y-2 animate-fade-up">
-          <div className="relative group">
+        <div 
+          key={index} 
+          className="space-y-2 animate-scale-in hover-lift"
+          style={{ animationDelay: `${index * 0.1}s` }}
+        >
+          <div className="relative group rounded-lg overflow-hidden shadow-md smooth-transition hover:shadow-xl">
             <ImagePreview
               src={image}
               onProcess={() => onProcess(index)}
@@ -44,12 +48,12 @@ export const ImageList = memo(({
               textDirection={textDirection}
               selectedFont={selectedFont}
             />
-            <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 smooth-transition">
               <Button
                 variant="destructive"
                 size="icon"
                 onClick={() => onRemove(index)}
-                className="rounded-full"
+                className="rounded-full shadow-lg hover:scale-110 smooth-transition"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -58,7 +62,7 @@ export const ImageList = memo(({
                   variant="secondary"
                   size="icon"
                   onClick={() => onDownloadSingle(index)}
-                  className="rounded-full"
+                  className="rounded-full shadow-lg hover:scale-110 smooth-transition"
                 >
                   <Download className="h-4 w-4" />
                 </Button>

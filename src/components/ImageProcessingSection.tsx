@@ -15,10 +15,13 @@ export const ImageProcessingSection = ({
   const { t } = useTranslation();
 
   return (
-    <div>
-      <p className="text-muted-foreground mb-4">
-        {t("uploadDescription")}
-      </p>
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-4 animate-fade-in">
+        <span className="w-1 h-5 bg-primary rounded-full"></span>
+        <p className="text-muted-foreground">
+          {t("uploadDescription")}
+        </p>
+      </div>
       <ImageProcessor 
         text={text}
         textDirection={textDirection}

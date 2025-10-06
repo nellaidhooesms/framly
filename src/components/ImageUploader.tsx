@@ -59,21 +59,23 @@ export const ImageUploader = ({ onImagesSelected, maxFiles, accept }: ImageUploa
     <div className="w-full">
       <div
         {...getRootProps()}
-        className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+        className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer smooth-transition ${
           isDragActive
-            ? "border-primary bg-primary/10"
+            ? "border-primary bg-primary/10 scale-[1.02] shadow-lg"
             : isUploading
             ? "border-muted bg-muted/50 cursor-not-allowed"
-            : "border-muted hover:border-primary/50"
+            : "border-muted hover:border-primary/50 hover:bg-accent/30 hover:shadow-md"
         }`}
       >
         <input {...getInputProps()} />
-        <div className="space-y-2">
-          <div className="text-2xl">📸</div>
+        <div className="space-y-3">
+          <div className={`text-4xl transition-transform duration-300 ${isDragActive ? 'scale-125' : 'scale-100'}`}>
+            📸
+          </div>
           {isDragActive ? (
-            <p>Drop the images here...</p>
+            <p className="text-lg font-medium animate-pulse">Drop the images here...</p>
           ) : isUploading ? (
-            <p className="text-muted-foreground">Uploading images...</p>
+            <p className="text-muted-foreground animate-pulse">Uploading images...</p>
           ) : (
             <>
               <p className="text-lg font-medium">Drag & drop images here</p>
@@ -85,8 +87,8 @@ export const ImageUploader = ({ onImagesSelected, maxFiles, accept }: ImageUploa
         </div>
       </div>
       {isUploading && (
-        <div className="mt-4">
-          <Progress value={uploadProgress} className="h-2" />
+        <div className="mt-4 animate-fade-in">
+          <Progress value={uploadProgress} className="h-2 smooth-transition" />
         </div>
       )}
     </div>
